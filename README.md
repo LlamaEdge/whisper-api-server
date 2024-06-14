@@ -36,6 +36,9 @@
     audio-api-server.wasm
   ```
 
+  > [!NOTE]
+  > The `wasmedge-burn` plugin is required to run the `whisper-api-server.wasm` binary. See [Build plugin](https://hackmd.io/@vincent-2nd/SkI3Fh_S0#Build-plugin) to build the plugin from source.
+
 - Send `curl` request to the transcriptions endpoint
 
   ```bash
