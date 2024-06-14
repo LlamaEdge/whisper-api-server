@@ -1,9 +1,12 @@
-use crate::{error, SERVER_INFO};
+use crate::{
+    error::{self, LlamaCoreError},
+    GRAPH, MAX_BUFFER_SIZE,
+};
 use endpoints::{
     audio::{TranscriptionObject, TranscriptionRequest},
     files::FileObject,
 };
-use futures_util::TryStreamExt;
+use hound::{self, SampleFormat};
 use hyper::{body::to_bytes, Body, Method, Request, Response};
 use multipart::server::{Multipart, ReadEntry, ReadEntryResult};
 use multipart_2021 as multipart;
@@ -63,15 +66,8 @@ pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response
                             }
                         };
 
-                        if !((filename).to_lowercase().ends_with(".mp3")
-                            || (filename).to_lowercase().ends_with(".mp4")
-                            || (filename).to_lowercase().ends_with(".mpeg")
-                            || (filename).to_lowercase().ends_with(".mpga")
-                            || (filename).to_lowercase().ends_with(".m4a")
-                            || (filename).to_lowercase().ends_with(".wav")
-                            || (filename).to_lowercase().ends_with(".webm"))
-                        {
-                            let err_msg = "Failed to upload the target audio file. File uploads are currently limited to 25 MB and the following input file types are supported: mp3, mp4, mpeg, mpga, m4a, wav, and webm.";
+                        if !(filename).to_lowercase().ends_with(".wav") {
+                            let err_msg = "The audio file (*.wav) must be have a sample rate of 16k and be single-channel.";
 
                             // log
                             error!(target: "audio_transcriptions_handler", "{}", err_msg);
@@ -150,17 +146,15 @@ pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response
                         match field.is_text() {
                             true => {
                                 let mut model = String::new();
-                                let size = match field.data.read_to_string(&mut model) {
-                                    Ok(size) => size,
-                                    Err(e) => {
-                                        let err_msg = format!("Failed to read the model. {}", e);
 
-                                        // log
-                                        error!(target: "audio_transcriptions_handler", "{}", &err_msg);
+                                if let Err(e) = field.data.read_to_string(&mut model) {
+                                    let err_msg = format!("Failed to read the model. {}", e);
 
-                                        return error::internal_server_error(err_msg);
-                                    }
-                                };
+                                    // log
+                                    error!(target: "audio_transcriptions_handler", "{}", &err_msg);
+
+                                    return error::internal_server_error(err_msg);
+                                }
 
                                 request.model = model;
                             }
@@ -187,11 +181,110 @@ pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response
             // log
             info!(target: "audio_transcriptions_handler", "audio transcription request: {:?}", &request);
 
-            // TODO: call the transcription service
+            let path = Path::new("archives")
+                .join(&request.file.id)
+                .join(&request.file.filename);
 
-            let obj = TranscriptionObject {
-                text: "This is a test".to_string(),
+            // load the audio waveform
+            let (waveform, sample_rate) = match load_audio_waveform(path) {
+                Ok((w, sr)) => (w, sr),
+                Err(e) => {
+                    let err_msg = format!("Failed to load audio file. {}", e);
+
+                    error!(target: "audio_transcriptions_handler", "{}", &err_msg);
+
+                    return error::internal_server_error(err_msg);
+                }
             };
+            assert_eq!(sample_rate, 16000, "The audio sample rate must be 16k.");
+
+            info!(target: "audio_transcriptions_handler", "Get the model instance.");
+            let graph = match GRAPH.get() {
+                Some(graph) => graph,
+                None => {
+                    let err_msg = "The GRAPH is not initialized.";
+
+                    error!(target: "audio_transcriptions_handler", "{}", err_msg);
+
+                    return error::internal_server_error(err_msg);
+                }
+            };
+
+            let mut graph = match graph.lock() {
+                Ok(graph) => graph,
+                Err(e) => {
+                    let err_msg = format!("Failed to lock the graph. {}", e);
+
+                    error!(target: "audio_transcriptions_handler", "{}", err_msg);
+
+                    return error::internal_server_error(err_msg);
+                }
+            };
+
+            // set the input tensor
+            info!(target: "audio_transcriptions_handler", "Feed the audio data to the model.");
+            if graph
+                .set_input(
+                    0,
+                    wasmedge_wasi_nn::TensorType::F32,
+                    &[1, waveform.len()],
+                    &waveform,
+                )
+                .is_err()
+            {
+                let err_msg = "Fail to set input tensor.";
+
+                error!(target: "audio_transcriptions_handler", "{}", err_msg);
+
+                return error::internal_server_error(err_msg);
+            };
+
+            // compute the graph
+            info!(target: "audio_transcriptions_handler", "Transcribe audio to text.");
+            if let Err(e) = graph.compute() {
+                let err_msg = format!("Fail to compute the graph. {}", e);
+
+                error!(target: "audio_transcriptions_handler", "{}", &err_msg);
+
+                return error::internal_server_error(err_msg);
+            }
+
+            // get the output tensor
+            info!(target: "audio_transcriptions_handler", "Retrieve the transcription data.");
+            let mut output_buffer = vec![0u8; MAX_BUFFER_SIZE];
+            match graph.get_output(0, &mut output_buffer) {
+                Ok(size) => {
+                    unsafe {
+                        output_buffer.set_len(size);
+                    }
+                    info!(target: "audio_transcriptions_handler", "Output buffer size: {}", size);
+                }
+                Err(e) => {
+                    let err_msg = format!("Failed to get the generated output tensor. {}", e);
+
+                    error!(target: "audio_transcriptions_handler", "{}", &err_msg);
+
+                    return error::internal_server_error(err_msg);
+                }
+            };
+
+            // decode the output buffer
+            info!(target: "audio_transcriptions_handler", "Decode the transcription data to plain text.");
+            let text = match std::str::from_utf8(&output_buffer[..]) {
+                Ok(output) => output.to_string(),
+                Err(e) => {
+                    let err_msg = format!(
+                        "Failed to decode the gerated buffer to a utf-8 string. {}",
+                        e
+                    );
+
+                    error!(target: "audio_transcriptions_handler", "{}", &err_msg);
+
+                    return error::internal_server_error(err_msg);
+                }
+            };
+
+            let obj = TranscriptionObject { text };
 
             // serialize chat completion object
             let s = match serde_json::to_string(&obj) {
@@ -241,56 +334,35 @@ pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response
     res
 }
 
-pub(crate) async fn server_info_handler() -> Response<Body> {
-    // log
-    info!(target: "server_info", "Handling the coming server info request.");
+fn load_audio_waveform(
+    filename: impl AsRef<std::path::Path>,
+) -> Result<(Vec<f32>, usize), LlamaCoreError> {
+    let reader =
+        hound::WavReader::open(filename).map_err(|e| LlamaCoreError::Operation(e.to_string()))?;
+    let spec = reader.spec();
 
-    // get the server info
-    let server_info = match SERVER_INFO.get() {
-        Some(server_info) => server_info,
-        None => {
-            let err_msg = "The server info is not set.";
+    // let duration = reader.duration() as usize;
+    let channels = spec.channels as usize;
+    let sample_rate = spec.sample_rate as usize;
+    // let bits_per_sample = spec.bits_per_sample;
+    let sample_format = spec.sample_format;
 
-            // log
-            error!(target: "server_info_handler", "{}", &err_msg);
+    assert_eq!(sample_rate, 16000, "The audio sample rate must be 16k.");
+    assert_eq!(channels, 1, "The audio must be single-channel.");
 
-            return error::internal_server_error("The server info is not set.");
-        }
+    let max_int_val = 2_u32.pow(spec.bits_per_sample as u32 - 1) - 1;
+
+    let floats = match sample_format {
+        SampleFormat::Float => reader
+            .into_samples::<f32>()
+            .collect::<hound::Result<_>>()
+            .map_err(|e| LlamaCoreError::Operation(e.to_string()))?,
+        SampleFormat::Int => reader
+            .into_samples::<i32>()
+            .map(|s| s.map(|s| s as f32 / max_int_val as f32))
+            .collect::<hound::Result<_>>()
+            .map_err(|e| LlamaCoreError::Operation(e.to_string()))?,
     };
 
-    // serialize server info
-    let s = match serde_json::to_string(&server_info) {
-        Ok(s) => s,
-        Err(e) => {
-            let err_msg = format!("Fail to serialize server info. {}", e);
-
-            // log
-            error!(target: "server_info_handler", "{}", &err_msg);
-
-            return error::internal_server_error(err_msg);
-        }
-    };
-
-    // return response
-    let result = Response::builder()
-        .header("Access-Control-Allow-Origin", "*")
-        .header("Access-Control-Allow-Methods", "*")
-        .header("Access-Control-Allow-Headers", "*")
-        .header("Content-Type", "application/json")
-        .body(Body::from(s));
-    let res = match result {
-        Ok(response) => response,
-        Err(e) => {
-            let err_msg = e.to_string();
-
-            // log
-            error!(target: "server_info_handler", "{}", &err_msg);
-
-            error::internal_server_error(err_msg)
-        }
-    };
-
-    info!(target: "server_info", "Send the server info response.");
-
-    res
+    Ok((floats, sample_rate))
 }

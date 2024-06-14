@@ -33,7 +33,7 @@ pub(crate) fn internal_server_error(msg: impl AsRef<str>) -> Response<Body> {
         .unwrap()
 }
 
-pub(crate) fn bad_request(msg: impl AsRef<str>) -> Response<Body> {
+pub(crate) fn _bad_request(msg: impl AsRef<str>) -> Response<Body> {
     let err_msg = match msg.as_ref().is_empty() {
         true => "400 Bad Request".to_string(),
         false => format!("400 Bad Request: {}", msg.as_ref()),
@@ -77,10 +77,15 @@ pub enum ServerError {
     /// Error returned while parsing socket address failed
     #[error("Failed to parse socket address: {0}")]
     SocketAddr(String),
-    /// Error returned while parsing CLI options failed
-    #[error("{0}")]
-    ArgumentError(String),
     /// Generic error returned while performing an operation
+    #[error("{0}")]
+    Operation(String),
+}
+
+/// Error types used by backend
+#[derive(Error, Debug)]
+pub(crate) enum LlamaCoreError {
+    /// Errors in General operation.
     #[error("{0}")]
     Operation(String),
 }
