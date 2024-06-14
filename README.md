@@ -54,3 +54,38 @@
       "text": " Hello, I am the whisper machine learning model. If you see this as text then I am working properly."
   }
   ```
+
+## Build
+
+- Clone the repository
+
+  ```bash
+  git clone https://github.com/LlamaEdge/whisper-api-server.git
+  ```
+
+- Build the `whisper-api-server.wasm` binary
+
+  ```bash
+  cd whisper-api-server
+
+  cargo build --release --target wasm32-wasi
+  ```
+
+  If the build is successful, you should see the `whisper-api-server.wasm` binary in the `target/wasm32-wasi/release` directory.
+
+## CLI Options
+
+```bash
+$ wasmedge whisper-api-server.wasm -h
+
+Whisper API Server
+
+Usage: whisper-api-server.wasm [OPTIONS]
+
+Options:
+  -m, --model-name <MODEL_NAME>    Model name [default: default]
+      --model-alias <MODEL_ALIAS>  Model alias [default: default]
+      --socket-addr <SOCKET_ADDR>  Socket address of Whisper API server instance [default: 0.0.0.0:8080]
+  -h, --help                       Print help
+  -V, --version                    Print version
+```
