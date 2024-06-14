@@ -20,9 +20,6 @@ use utils::{Graph, LogLevel, Metadata};
 
 type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
 
-// server info
-// pub(crate) static SERVER_INFO: OnceCell<ServerInfo> = OnceCell::new();
-
 // whisper model
 pub(crate) static GRAPH: OnceCell<Mutex<Graph>> = OnceCell::new();
 
@@ -40,9 +37,6 @@ struct Cli {
     /// Model alias.
     #[arg(long, default_value = "default")]
     model_alias: String,
-    /// Audio file.
-    #[arg(long, required = true)]
-    audio: String,
     /// Socket address of Whisper API server instance
     #[arg(long, default_value = DEFAULT_SOCKET_ADDRESS)]
     socket_addr: String,
@@ -67,13 +61,10 @@ async fn main() -> Result<(), ServerError> {
     info!(target: "server_config", "server version: {}", env!("CARGO_PKG_VERSION"));
 
     // log model name
-    info!(target: "server_config", "model_name: {}", &cli.model_name);
+    info!(target: "server_config", "model name: {}", &cli.model_name);
 
     // log model alias
-    info!(target: "server_config", "model_alias: {}", &cli.model_alias);
-
-    // log audio file
-    info!(target: "server_config", "audio: {}", &cli.audio);
+    info!(target: "server_config", "model alias: {}", &cli.model_alias);
 
     // create a Metadata instance
     let metadata = Metadata {
