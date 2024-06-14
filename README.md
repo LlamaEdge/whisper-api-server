@@ -33,7 +33,7 @@
   ```bash
   wasmedge --dir .:. \
     --nn-preload default:Burn:CPU:tiny_en.mpk:tiny_en.cfg:tokenizer.json:en \
-    audio-api-server.wasm
+    whisper-api-server.wasm
   ```
 
   > [!NOTE]
