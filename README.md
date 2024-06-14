@@ -19,13 +19,13 @@
 - Download audio file
 
   ```bash
-  curl -LO https://github.com/LlamaEdge/audio-api-server/raw/main/data/audio16k.wav
+  curl -LO https://github.com/LlamaEdge/whisper-api-server/raw/main/data/audio16k.wav
   ```
 
 - Download `whisper-api-server.wasm` binary
 
   ```bash
-  curl -LO https://github.com/LlamaEdge/audio-api-server/raw/main/whisper-api-server.wasm
+  curl -LO https://github.com/LlamaEdge/whisper-api-server/raw/main/whisper-api-server.wasm
   ```
 
 - Start `whisper-api-server`
