@@ -1,6 +1,3 @@
-#[macro_use]
-extern crate log;
-
 mod backend;
 mod error;
 mod utils;
@@ -16,7 +13,7 @@ use hyper::{
 };
 use once_cell::sync::OnceCell;
 use std::{net::SocketAddr, path::PathBuf, sync::Mutex};
-use utils::{Graph, LogLevel, Metadata};
+use utils::{Graph, Metadata};
 
 type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
 
@@ -44,27 +41,17 @@ struct Cli {
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<(), ServerError> {
-    // get the environment variable `LLAMA_LOG`
-    let log_level: LogLevel = std::env::var("LLAMA_LOG")
-        .unwrap_or("info".to_string())
-        .parse()
-        .unwrap_or(LogLevel::Info);
-
-    // set global logger
-    wasi_logger::Logger::install().expect("failed to install wasi_logger::Logger");
-    log::set_max_level(log_level.into());
-
     // parse the command line arguments
     let cli = Cli::parse();
 
     // log the version of the server
-    info!(target: "server_config", "server version: {}", env!("CARGO_PKG_VERSION"));
+    println!("[INFO] Whisper API Server v{}", env!("CARGO_PKG_VERSION"));
 
     // log model name
-    info!(target: "server_config", "model name: {}", &cli.model_name);
+    println!("[INFO] model name: {}", &cli.model_name);
 
     // log model alias
-    info!(target: "server_config", "model alias: {}", &cli.model_alias);
+    println!("[INFO] model alias: {}", &cli.model_alias);
 
     // create a Metadata instance
     let metadata = Metadata {
@@ -86,11 +73,15 @@ async fn main() -> Result<(), ServerError> {
         .map_err(|e| ServerError::SocketAddr(e.to_string()))?;
 
     // log socket address
-    info!(target: "server_config", "socket_address: {}", addr.to_string());
+    println!("[INFO] socket_address: {}", addr.to_string());
 
     let new_service = make_service_fn(move |conn: &AddrStream| {
         // log socket address
-        info!(target: "connection", "remote_addr: {}, local_addr: {}", conn.remote_addr().to_string(), conn.local_addr().to_string());
+        println!(
+            "[INFO] remote_addr: {}, local_addr: {}",
+            conn.remote_addr().to_string(),
+            conn.local_addr().to_string()
+        );
 
         async move { Ok::<_, Error>(service_fn(handle_request)) }
     });
@@ -126,9 +117,15 @@ async fn handle_request(req: Request<Body>) -> Result<Response<Body>, hyper::Err
                 .parse()
                 .unwrap();
 
-            info!(target: "request", "method: {}, endpoint: {}, http_version: {}, size: {}", method, path, version, size);
+            println!(
+                "[INFO] method: {}, endpoint: {}, http_version: {}, size: {}",
+                method, path, version, size
+            );
         } else {
-            info!(target: "request", "method: {}, endpoint: {}, http_version: {}", method, path, version);
+            println!(
+                "[INFO] method: {}, endpoint: {}, http_version: {}",
+                method, path, version
+            );
         }
     }
 
@@ -152,7 +149,16 @@ async fn handle_request(req: Request<Body>) -> Result<Response<Body>, hyper::Err
             let response_is_client_error = status_code.is_client_error();
             let response_is_server_error = status_code.is_server_error();
 
-            info!(target: "response", "version: {}, body_size: {}, status: {}, is_informational: {}, is_success: {}, is_redirection: {}, is_client_error: {}, is_server_error: {}", response_version, response_body_size, response_status, response_is_informational, response_is_success, response_is_redirection, response_is_client_error, response_is_server_error);
+            println!(
+                "[INFO] version: {}, body_size: {}, status: {}, is_informational: {}, is_success: {}, is_redirection: {}, is_client_error: {}, is_server_error: {}",
+                response_version,
+                response_body_size,
+                response_status,
+                response_is_informational,
+                response_is_success,
+                response_is_redirection,
+                response_is_client_error,
+                response_is_server_error);
         } else {
             let response_version = format!("{:?}", response.version());
             let response_body_size: u64 = response.body().size_hint().lower();
@@ -163,7 +169,17 @@ async fn handle_request(req: Request<Body>) -> Result<Response<Body>, hyper::Err
             let response_is_client_error = status_code.is_client_error();
             let response_is_server_error = status_code.is_server_error();
 
-            error!(target: "response", "version: {}, body_size: {}, status: {}, is_informational: {}, is_success: {}, is_redirection: {}, is_client_error: {}, is_server_error: {}", response_version, response_body_size, response_status, response_is_informational, response_is_success, response_is_redirection, response_is_client_error, response_is_server_error);
+            println!(
+                "[ERROR] version: {}, body_size: {}, status: {}, is_informational: {}, is_success: {}, is_redirection: {}, is_client_error: {}, is_server_error: {}",
+                response_version,
+                response_body_size,
+                response_status,
+                response_is_informational,
+                response_is_success,
+                response_is_redirection,
+                response_is_client_error,
+                response_is_server_error
+            );
         }
     }
 

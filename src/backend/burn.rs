@@ -19,7 +19,7 @@ use std::{
 
 pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response<Body> {
     // log
-    info!(target: "audio_transcriptions_handler", "Handling the coming audio transcription request");
+    println!("[INFO] Handling the coming audio transcription request");
 
     let res = match *req.method() {
         Method::POST => {
@@ -38,7 +38,7 @@ pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response
                     let err_msg = format!("Fail to read buffer from request body. {}", e);
 
                     // log
-                    error!(target: "files_handler", "{}", &err_msg);
+                    println!("[ERROR] {}", &err_msg);
 
                     return error::internal_server_error(err_msg);
                 }
@@ -60,7 +60,7 @@ pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response
                                     "Failed to upload the target file. The filename is not provided.";
 
                                 // log
-                                error!(target: "files_handler", "{}", &err_msg);
+                                println!("[ERROR] {}", &err_msg);
 
                                 return error::internal_server_error(err_msg);
                             }
@@ -70,7 +70,7 @@ pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response
                             let err_msg = "The audio file (*.wav) must be have a sample rate of 16k and be single-channel.";
 
                             // log
-                            error!(target: "audio_transcriptions_handler", "{}", err_msg);
+                            println!("[ERROR] {}", &err_msg);
 
                             return error::internal_server_error(err_msg);
                         }
@@ -82,7 +82,7 @@ pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response
                                 let err_msg = format!("Failed to read the target file. {}", e);
 
                                 // log
-                                error!(target: "files_handler", "{}", &err_msg);
+                                println!("[ERROR] {}", &err_msg);
 
                                 return error::internal_server_error(err_msg);
                             }
@@ -92,7 +92,7 @@ pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response
                         let id = format!("file_{}", uuid::Uuid::new_v4());
 
                         // log
-                        info!(target: "audio_transcriptions_handler", "file_id: {}, file_name: {}", &id, &filename);
+                        println!("[INFO] file_id: {}, file_name: {}", &id, &filename);
 
                         // save the file
                         let path = Path::new("archives");
@@ -112,7 +112,7 @@ pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response
                                 );
 
                                 // log
-                                error!(target: "files_handler", "{}", &err_msg);
+                                println!("[ERROR] {}", &err_msg);
 
                                 return error::internal_server_error(err_msg);
                             }
@@ -126,7 +126,7 @@ pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response
                                     let err_msg = "Failed to get the current time.";
 
                                     // log
-                                    error!(target: "files_handler", "{}", &err_msg);
+                                    println!("[ERROR] {}", &err_msg);
 
                                     return error::internal_server_error(err_msg);
                                 }
@@ -151,7 +151,7 @@ pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response
                                     let err_msg = format!("Failed to read the model. {}", e);
 
                                     // log
-                                    error!(target: "audio_transcriptions_handler", "{}", &err_msg);
+                                    println!("[ERROR] {}", &err_msg);
 
                                     return error::internal_server_error(err_msg);
                                 }
@@ -163,7 +163,7 @@ pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response
                                     "Failed to get the model name. The model field in the request should be a text field.";
 
                                 // log
-                                error!(target: "audio_transcriptions_handler", "{}", err_msg);
+                                println!("[ERROR] {}", &err_msg);
 
                                 return error::internal_server_error(err_msg);
                             }
@@ -179,7 +179,7 @@ pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response
             }
 
             // log
-            info!(target: "audio_transcriptions_handler", "audio transcription request: {:?}", &request);
+            println!("[INFO] audio transcription request: {:?}", &request);
 
             let path = Path::new("archives")
                 .join(&request.file.id)
@@ -191,20 +191,20 @@ pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response
                 Err(e) => {
                     let err_msg = format!("Failed to load audio file. {}", e);
 
-                    error!(target: "audio_transcriptions_handler", "{}", &err_msg);
+                    println!("[ERROR] {}", &err_msg);
 
                     return error::internal_server_error(err_msg);
                 }
             };
             assert_eq!(sample_rate, 16000, "The audio sample rate must be 16k.");
 
-            info!(target: "audio_transcriptions_handler", "Get the model instance.");
+            println!("[INFO] Get the model instance.");
             let graph = match GRAPH.get() {
                 Some(graph) => graph,
                 None => {
                     let err_msg = "The GRAPH is not initialized.";
 
-                    error!(target: "audio_transcriptions_handler", "{}", err_msg);
+                    println!("[ERROR] {}", &err_msg);
 
                     return error::internal_server_error(err_msg);
                 }
@@ -215,14 +215,14 @@ pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response
                 Err(e) => {
                     let err_msg = format!("Failed to lock the graph. {}", e);
 
-                    error!(target: "audio_transcriptions_handler", "{}", err_msg);
+                    println!("[ERROR] {}", &err_msg);
 
                     return error::internal_server_error(err_msg);
                 }
             };
 
             // set the input tensor
-            info!(target: "audio_transcriptions_handler", "Feed the audio data to the model.");
+            println!("[INFO] Feed the audio data to the model.");
             if graph
                 .set_input(
                     0,
@@ -234,42 +234,42 @@ pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response
             {
                 let err_msg = "Fail to set input tensor.";
 
-                error!(target: "audio_transcriptions_handler", "{}", err_msg);
+                println!("[ERROR] {}", &err_msg);
 
                 return error::internal_server_error(err_msg);
             };
 
             // compute the graph
-            info!(target: "audio_transcriptions_handler", "Transcribe audio to text.");
+            println!("[INFO] Transcribe audio to text.");
             if let Err(e) = graph.compute() {
                 let err_msg = format!("Fail to compute the graph. {}", e);
 
-                error!(target: "audio_transcriptions_handler", "{}", &err_msg);
+                println!("[ERROR] {}", &err_msg);
 
                 return error::internal_server_error(err_msg);
             }
 
             // get the output tensor
-            info!(target: "audio_transcriptions_handler", "Retrieve the transcription data.");
+            println!("[INFO] Retrieve the transcription data.");
             let mut output_buffer = vec![0u8; MAX_BUFFER_SIZE];
             match graph.get_output(0, &mut output_buffer) {
                 Ok(size) => {
                     unsafe {
                         output_buffer.set_len(size);
                     }
-                    info!(target: "audio_transcriptions_handler", "Output buffer size: {}", size);
+                    println!("[INFO] Output buffer size: {}", size);
                 }
                 Err(e) => {
                     let err_msg = format!("Failed to get the generated output tensor. {}", e);
 
-                    error!(target: "audio_transcriptions_handler", "{}", &err_msg);
+                    println!("[ERROR] {}", &err_msg);
 
                     return error::internal_server_error(err_msg);
                 }
             };
 
             // decode the output buffer
-            info!(target: "audio_transcriptions_handler", "Decode the transcription data to plain text.");
+            println!("[INFO] Decode the transcription data to plain text.");
             let text = match std::str::from_utf8(&output_buffer[..]) {
                 Ok(output) => output.to_string(),
                 Err(e) => {
@@ -278,7 +278,7 @@ pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response
                         e
                     );
 
-                    error!(target: "audio_transcriptions_handler", "{}", &err_msg);
+                    println!("[ERROR] {}", &err_msg);
 
                     return error::internal_server_error(err_msg);
                 }
@@ -293,7 +293,7 @@ pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response
                     let err_msg = format!("Failed to serialize transcription object. {}", e);
 
                     // log
-                    error!(target: "audio_transcriptions_handler", "{}", &err_msg);
+                    println!("[ERROR] {}", &err_msg);
 
                     return error::internal_server_error(err_msg);
                 }
@@ -313,7 +313,7 @@ pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response
                     let err_msg = e.to_string();
 
                     // log
-                    error!(target: "audio_transcriptions_handler", "{}", &err_msg);
+                    println!("[ERROR] {}", &err_msg);
 
                     error::internal_server_error(err_msg)
                 }
@@ -323,13 +323,13 @@ pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response
             let err_msg = "Invalid HTTP Method.";
 
             // log
-            error!(target: "files_handler", "{}", &err_msg);
+            println!("[ERROR] {}", &err_msg);
 
             error::internal_server_error(err_msg)
         }
     };
 
-    info!(target: "audio_transcriptions_handler", "Send the audio transcription response");
+    println!("[INFO] Send the audio transcription response");
 
     res
 }
