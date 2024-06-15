@@ -268,7 +268,9 @@ dependencies = [
 
 [[package]]
 name = "endpoints"
-version = "0.8.1"
+version = "0.8.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "361f8223077555a84bb0179e54dfe94570c6de76623e6b6f860a59736f0df5de"
 dependencies = [
  "indexmap 2.2.6",
  "serde",
