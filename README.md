@@ -38,6 +38,7 @@
 
   > [!NOTE]
   > The `wasmedge-burn` plugin is required to run the `whisper-api-server.wasm` binary. See [Build plugin](https://hackmd.io/@vincent-2nd/SkI3Fh_S0#Build-plugin) to build the plugin from source.
+  > For Apple Silicon users, you can download the plugin [here](https://github.com/second-state/wasmedge-burn-plugin/raw/main/libwasmedgePluginWasiNN.dylib).
 
 - Send `curl` request to the transcriptions endpoint
 
