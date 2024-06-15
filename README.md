@@ -5,21 +5,19 @@
 - Download `whisper-burn/tiny_en` model
 
   ```bash
-  curl -LO https://huggingface.co/Gadersd/whisper-burn/raw/main/tiny_en/tiny_en.cfg
-  curl -LO https://huggingface.co/Gadersd/whisper-burn/resolve/main/tiny_en/tiny_en.mpk.gz
-  curl -LO https://huggingface.co/Gadersd/whisper-burn/raw/main/tiny_en/tokenizer.json
+  curl -LO https://huggingface.co/second-state/whisper-burn/resolve/main/tiny_en.tar.gz
   ```
 
-- Unzip `tiny_en.mpk.gz`
+  Then, unzip the `tiny_en.tar.gz` file to get the `tiny_en.mpk`, `tiny_en.cfg`, and `tokenizer.json` files.
 
   ```bash
-  gunzip tiny_en.mpk.gz
+  tar -xvzf tiny_en.tar.gz
   ```
 
 - Download audio file
 
   ```bash
-  curl -LO https://github.com/LlamaEdge/whisper-api-server/raw/main/data/audio16k.wav
+  curl -LO https://huggingface.co/second-state/whisper-burn/resolve/main/audio16k.wav
   ```
 
 - Download `whisper-api-server.wasm` binary
