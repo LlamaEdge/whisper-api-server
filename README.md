@@ -41,7 +41,7 @@
 - Send `curl` request to the transcriptions endpoint
 
   ```bash
-  curl http://localhost:10086/v1/audio/transcriptions \
+  curl http://localhost:8080/v1/audio/transcriptions \
     -H "Content-Type: multipart/form-data" \
     -F file="@audio16k.wav"
   ```
@@ -88,3 +88,38 @@ Options:
   -h, --help                       Print help
   -V, --version                    Print version
 ```
+
+## Run with Docker
+
+  ```bash
+  ./docker-build.sh
+
+  docker run \
+    --runtime=io.containerd.wasmedge.v1 \
+    --platform=wasi/wasm \
+    --env WASMEDGE_WASINN_PRELOAD=default:Burn:GPU:/tiny_en.mpk:/tiny_en.cfg:/tokenizer.json:en \
+    -p 8080:8080 \
+    burn-whisper-server:latest
+  ```
+
+or 
+
+  ```
+  docker pull secondstate/burn-whisper-server:latest
+
+  docker run \
+    --runtime=io.containerd.wasmedge.v1 \
+    --platform=wasi/wasm \
+    --env WASMEDGE_WASINN_PRELOAD=default:Burn:GPU:/tiny_en.mpk:/tiny_en.cfg:/tokenizer.json:en \
+    -p 8080:8080 \
+    secondstate/burn-whisper-server:latest
+  ```
+
+Then
+
+  ```bash
+  curl http://localhost:8080/v1/audio/transcriptions \
+    -H "Content-Type: multipart/form-data" \
+    -F file="@audio16k.wav"
+  ```
+
