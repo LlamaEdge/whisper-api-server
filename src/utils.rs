@@ -5,7 +5,7 @@ use wasmedge_wasi_nn::{Graph as WasiNnGraph, GraphExecutionContext, TensorType};
 #[derive(Debug)]
 pub(crate) struct Graph {
     _graph: WasiNnGraph,
-    context: GraphExecutionContext,
+    context: Option<GraphExecutionContext>,
 }
 impl Graph {
     /// Create a new computation graph from the given metadata.
@@ -24,19 +24,23 @@ impl Graph {
             LlamaCoreError::Operation(err_msg)
         })?;
 
-        // initialize the execution context
-        let context = graph.init_execution_context().map_err(|e| {
-            let err_msg = e.to_string();
-
-            println!("ERROR: {}", &err_msg);
-
-            LlamaCoreError::Operation(err_msg)
-        })?;
-
         Ok(Self {
             _graph: graph,
-            context,
+            context: None,
         })
+    }
+
+    /// Initialize the execution context.
+    pub(crate) fn init_execution_context(&mut self) -> Result<(), LlamaCoreError> {
+        self.context = Some(self._graph.init_execution_context().map_err(|e| {
+            let err_msg = e.to_string();
+
+            println!("[ERROR] {}", &err_msg);
+
+            LlamaCoreError::Operation(err_msg)
+        })?);
+
+        Ok(())
     }
 
     /// Set input uses the data, not only [u8](https://doc.rust-lang.org/nightly/std/primitive.u8.html), but also [f32](https://doc.rust-lang.org/nightly/std/primitive.f32.html), [i32](https://doc.rust-lang.org/nightly/std/primitive.i32.html), etc.
@@ -47,26 +51,40 @@ impl Graph {
         dimensions: &[usize],
         data: impl AsRef<[T]>,
     ) -> Result<(), LlamaCoreError> {
-        self.context
-            .set_input(index, tensor_type, dimensions, data)
-            .map_err(|e| {
+        match self.context.as_mut() {
+            None => {
+                return Err(LlamaCoreError::Operation(
+                    "Execution context is not initialized".to_string(),
+                ));
+            }
+            Some(context) => context
+                .set_input(index, tensor_type, dimensions, data)
+                .map_err(|e| {
+                    let err_msg = e.to_string();
+
+                    println!("[ERROR] {}", &err_msg);
+
+                    LlamaCoreError::Operation(err_msg)
+                }),
+        }
+    }
+
+    /// Compute the inference on the given inputs.
+    pub(crate) fn compute(&mut self) -> Result<(), LlamaCoreError> {
+        match self.context.as_mut() {
+            None => {
+                return Err(LlamaCoreError::Operation(
+                    "Execution context is not initialized".to_string(),
+                ));
+            }
+            Some(context) => context.compute().map_err(|e| {
                 let err_msg = e.to_string();
 
                 println!("[ERROR] {}", &err_msg);
 
                 LlamaCoreError::Operation(err_msg)
-            })
-    }
-
-    /// Compute the inference on the given inputs.
-    pub(crate) fn compute(&mut self) -> Result<(), LlamaCoreError> {
-        self.context.compute().map_err(|e| {
-            let err_msg = e.to_string();
-
-            println!("[ERROR] {}", &err_msg);
-
-            LlamaCoreError::Operation(err_msg)
-        })
+            }),
+        }
     }
 
     /// Copy output tensor to out_buffer, return the output’s **size in bytes**.
@@ -75,13 +93,20 @@ impl Graph {
         index: usize,
         out_buffer: &mut [T],
     ) -> Result<usize, LlamaCoreError> {
-        self.context.get_output(index, out_buffer).map_err(|e| {
-            let err_msg = e.to_string();
+        match self.context.as_ref() {
+            None => {
+                return Err(LlamaCoreError::Operation(
+                    "Execution context is not initialized".to_string(),
+                ));
+            }
+            Some(context) => context.get_output(index, out_buffer).map_err(|e| {
+                let err_msg = e.to_string();
 
-            println!("[ERROR] {}", &err_msg);
+                println!("[ERROR] {}", &err_msg);
 
-            LlamaCoreError::Operation(err_msg)
-        })
+                LlamaCoreError::Operation(err_msg)
+            }),
+        }
     }
 }
 

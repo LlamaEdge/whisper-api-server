@@ -221,18 +221,24 @@ pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response
                 }
             };
 
+            println!("[INFO] Initialize the execution context.");
+            if let Err(e) = graph.init_execution_context() {
+                let err_msg = format!("Failed to initialize the execution context. {}", e);
+
+                println!("[ERROR] {}", &err_msg);
+
+                return error::internal_server_error(err_msg);
+            }
+
             // set the input tensor
             println!("[INFO] Feed the audio data to the model.");
-            if graph
-                .set_input(
-                    0,
-                    wasmedge_wasi_nn::TensorType::F32,
-                    &[1, waveform.len()],
-                    &waveform,
-                )
-                .is_err()
-            {
-                let err_msg = "Fail to set input tensor.";
+            if let Err(e) = graph.set_input(
+                0,
+                wasmedge_wasi_nn::TensorType::F32,
+                &[1, waveform.len()],
+                &waveform,
+            ) {
+                let err_msg = format!("Fail to set input tensor. {}", e);
 
                 println!("[ERROR] {}", &err_msg);
 
