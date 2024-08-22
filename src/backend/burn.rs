@@ -3,7 +3,7 @@ use crate::{
     GRAPH, MAX_BUFFER_SIZE,
 };
 use endpoints::{
-    audio::{TranscriptionObject, TranscriptionRequest},
+    audio::transcription::{TranscriptionObject, TranscriptionRequest},
     files::FileObject,
 };
 use hound::{self, SampleFormat};
@@ -48,8 +48,8 @@ pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response
 
             let mut multipart = Multipart::with_body(cursor, boundary.unwrap());
 
+            // create a transcription request
             let mut request = TranscriptionRequest::default();
-            // let mut file_object: Option<FileObject> = None;
             while let ReadEntryResult::Entry(mut field) = multipart.read_entry_mut() {
                 match &*field.headers.name {
                     "file" => {
