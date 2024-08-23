@@ -1,6 +1,5 @@
 mod backend;
 mod error;
-mod utils;
 
 use anyhow::Result;
 use clap::Parser;
@@ -11,17 +10,10 @@ use hyper::{
     service::{make_service_fn, service_fn},
     Body, Request, Response, Server,
 };
-use once_cell::sync::OnceCell;
-use std::{net::SocketAddr, path::PathBuf, sync::Mutex};
+use std::{net::SocketAddr, path::PathBuf};
 use tokio::net::TcpListener;
-use utils::{Graph, Metadata};
 
 type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
-
-// whisper model
-pub(crate) static GRAPH: OnceCell<Mutex<Graph>> = OnceCell::new();
-
-pub(crate) const MAX_BUFFER_SIZE: usize = 2usize.pow(14) * 15 + 128;
 
 // default socket address of LlamaEdge API Server instance
 const DEFAULT_SOCKET_ADDRESS: &str = "0.0.0.0:8080";
@@ -55,17 +47,10 @@ async fn main() -> Result<(), ServerError> {
     println!("[INFO] model alias: {}", &cli.model_alias);
 
     // create a Metadata instance
-    let metadata = Metadata {
-        model_alias: cli.model_alias.clone(),
-    };
+    let metadata = llama_core::AudioMetadataBuilder::new(&cli.model_name, &cli.model_alias).build();
 
-    // create a Graph instance
-    let graph = Graph::new(&metadata).map_err(|e| ServerError::Operation(e.to_string()))?;
-
-    // set GRAPH
-    GRAPH
-        .set(Mutex::new(graph))
-        .map_err(|_| ServerError::Operation("Failed to set `GRAPH`.".to_string()))?;
+    // init the audio context
+    llama_core::init_audio_context(&metadata).map_err(|e| ServerError::Operation(e.to_string()))?;
 
     // socket address
     let addr = cli
@@ -86,8 +71,6 @@ async fn main() -> Result<(), ServerError> {
 
         async move { Ok::<_, Error>(service_fn(handle_request)) }
     });
-
-    // let server = Server::bind(&addr).serve(new_service);
 
     let tcp_listener = TcpListener::bind(addr).await.unwrap();
     let server = Server::from_tcp(tcp_listener.into_std().unwrap())

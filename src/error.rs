@@ -81,11 +81,3 @@ pub enum ServerError {
     #[error("{0}")]
     Operation(String),
 }
-
-/// Error types used by backend
-#[derive(Error, Debug)]
-pub(crate) enum LlamaCoreError {
-    /// Errors in General operation.
-    #[error("{0}")]
-    Operation(String),
-}
