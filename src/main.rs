@@ -26,11 +26,14 @@ const DEFAULT_SOCKET_ADDRESS: &str = "0.0.0.0:8080";
 #[command(name = "Whisper API Server", version = env!("CARGO_PKG_VERSION"), author = env!("CARGO_PKG_AUTHORS"), about = "Whisper API Server")]
 struct Cli {
     /// Model name.
-    #[arg(short, long, default_value = "default")]
+    #[arg(short = 'n', long, default_value = "default")]
     model_name: String,
     /// Model alias.
-    #[arg(long, default_value = "default")]
+    #[arg(short = 'a', long, default_value = "default")]
     model_alias: String,
+    /// Path to the whisper model file
+    #[arg(short = 'm', long)]
+    model: PathBuf,
     /// Socket address of Whisper API server instance
     #[arg(long, default_value = DEFAULT_SOCKET_ADDRESS)]
     socket_addr: String,
@@ -64,6 +67,9 @@ async fn main() -> Result<(), ServerError> {
     // log model alias
     info!(target: "stdout", "model alias: {}", &cli.model_alias);
 
+    // log model path
+    info!(target: "stdout", "model path: {}", cli.model.display());
+
     // create a Metadata instance
     let metadata = llama_core::AudioMetadataBuilder::new(&cli.model_name, &cli.model_alias)
         .enable_plugin_log(true)
@@ -71,7 +77,8 @@ async fn main() -> Result<(), ServerError> {
         .build();
 
     // init the audio context
-    llama_core::init_audio_context(&metadata).map_err(|e| ServerError::Operation(e.to_string()))?;
+    llama_core::init_whisper_context(&metadata, &cli.model)
+        .map_err(|e| ServerError::Operation(e.to_string()))?;
 
     // socket address
     let addr = cli
