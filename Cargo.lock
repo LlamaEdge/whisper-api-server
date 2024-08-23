@@ -3029,12 +3029,14 @@ dependencies = [
  "endpoints",
  "hyper 0.14.28",
  "llama-core",
+ "log 0.4.22",
  "multipart-2021",
+ "serde",
  "serde_json",
  "thiserror",
  "tokio",
  "uuid",
- "wasmedge-wasi-nn",
+ "wasi-logger",
 ]
 
 [[package]]
