@@ -18,11 +18,21 @@ pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response
         Method::POST => {
             let boundary = "boundary=";
 
-            let boundary = req.headers().get("content-type").and_then(|ct| {
+            let boundary = match req.headers().get("content-type").and_then(|ct| {
                 let ct = ct.to_str().ok()?;
                 let idx = ct.find(boundary)?;
                 Some(ct[idx + boundary.len()..].to_string())
-            });
+            }) {
+                Some(boundary) => boundary,
+                None => {
+                    let err_msg = "Failed to get the boundary from the request.";
+
+                    // log
+                    error!(target: "stdout", "{}", &err_msg);
+
+                    return error::internal_server_error(err_msg);
+                }
+            };
 
             let req_body = req.into_body();
             let body_bytes = match to_bytes(req_body).await {
@@ -39,7 +49,7 @@ pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response
 
             let cursor = Cursor::new(body_bytes.to_vec());
 
-            let mut multipart = Multipart::with_body(cursor, boundary.unwrap());
+            let mut multipart = Multipart::with_body(cursor, boundary);
 
             // create a transcription request
             let mut request = TranscriptionRequest::default();
