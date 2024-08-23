@@ -12,7 +12,7 @@ use std::{
 
 pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response<Body> {
     // log
-    println!("[INFO] Handling the coming audio transcription request");
+    info!(target: "stdout", "handling the coming audio transcription request");
 
     let res = match *req.method() {
         Method::POST => {
@@ -31,7 +31,7 @@ pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response
                     let err_msg = format!("Fail to read buffer from request body. {}", e);
 
                     // log
-                    println!("[ERROR] {}", &err_msg);
+                    error!(target: "stdout", "{}", &err_msg);
 
                     return error::internal_server_error(err_msg);
                 }
@@ -53,7 +53,7 @@ pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response
                                     "Failed to upload the target file. The filename is not provided.";
 
                                 // log
-                                println!("[ERROR] {}", &err_msg);
+                                error!(target: "stdout", "{}", &err_msg);
 
                                 return error::internal_server_error(err_msg);
                             }
@@ -63,7 +63,7 @@ pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response
                             let err_msg = "The audio file (*.wav) must be have a sample rate of 16k and be single-channel.";
 
                             // log
-                            println!("[ERROR] {}", &err_msg);
+                            error!(target: "stdout", "{}", &err_msg);
 
                             return error::internal_server_error(err_msg);
                         }
@@ -75,7 +75,7 @@ pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response
                                 let err_msg = format!("Failed to read the target file. {}", e);
 
                                 // log
-                                println!("[ERROR] {}", &err_msg);
+                                error!(target: "stdout", "{}", &err_msg);
 
                                 return error::internal_server_error(err_msg);
                             }
@@ -85,7 +85,7 @@ pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response
                         let id = format!("file_{}", uuid::Uuid::new_v4());
 
                         // log
-                        println!("[INFO] file_id: {}, file_name: {}", &id, &filename);
+                        info!(target: "stdout", "file_id: {}, file_name: {}", &id, &filename);
 
                         // save the file
                         let path = Path::new("archives");
@@ -105,7 +105,7 @@ pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response
                                 );
 
                                 // log
-                                println!("[ERROR] {}", &err_msg);
+                                error!(target: "stdout", "{}", &err_msg);
 
                                 return error::internal_server_error(err_msg);
                             }
@@ -119,7 +119,7 @@ pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response
                                     let err_msg = "Failed to get the current time.";
 
                                     // log
-                                    println!("[ERROR] {}", &err_msg);
+                                    error!(target: "stdout", "{}", &err_msg);
 
                                     return error::internal_server_error(err_msg);
                                 }
@@ -144,7 +144,7 @@ pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response
                                     let err_msg = format!("Failed to read the model. {}", e);
 
                                     // log
-                                    println!("[ERROR] {}", &err_msg);
+                                    error!(target: "stdout", "{}", &err_msg);
 
                                     return error::internal_server_error(err_msg);
                                 }
@@ -156,7 +156,7 @@ pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response
                                     "Failed to get the model name. The model field in the request should be a text field.";
 
                                 // log
-                                println!("[ERROR] {}", &err_msg);
+                                error!(target: "stdout", "{}", &err_msg);
 
                                 return error::internal_server_error(err_msg);
                             }
@@ -177,7 +177,7 @@ pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response
                     let err_msg = format!("Failed to transcribe the audio. {}", e);
 
                     // log
-                    println!("[ERROR] {}", &err_msg);
+                    error!(target: "stdout", "{}", &err_msg);
 
                     return error::internal_server_error(err_msg);
                 }
@@ -190,7 +190,7 @@ pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response
                     let err_msg = format!("Failed to serialize transcription object. {}", e);
 
                     // log
-                    println!("[ERROR] {}", &err_msg);
+                    error!(target: "stdout", "{}", &err_msg);
 
                     return error::internal_server_error(err_msg);
                 }
@@ -210,7 +210,7 @@ pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response
                     let err_msg = e.to_string();
 
                     // log
-                    println!("[ERROR] {}", &err_msg);
+                    error!(target: "stdout", "{}", &err_msg);
 
                     error::internal_server_error(err_msg)
                 }
@@ -220,13 +220,13 @@ pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response
             let err_msg = "Invalid HTTP Method.";
 
             // log
-            println!("[ERROR] {}", &err_msg);
+            error!(target: "stdout", "{}", &err_msg);
 
             error::internal_server_error(err_msg)
         }
     };
 
-    println!("[INFO] Send the audio transcription response");
+    info!(target: "stdout", "send the audio transcription response");
 
     res
 }
