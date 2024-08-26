@@ -2,17 +2,9 @@
 
 ## Quick Start
 
-- Download `whisper-burn/tiny_en` model
+- Install `WasmEdge v0.14.1` with `wasi_nn-whisper` plugin
 
-  ```bash
-  curl -LO https://huggingface.co/second-state/whisper-burn/resolve/main/tiny_en.tar.gz
-  ```
-
-  Then, unzip the `tiny_en.tar.gz` file to get the `tiny_en.mpk`, `tiny_en.cfg`, and `tokenizer.json` files.
-
-  ```bash
-  tar -xvzf tiny_en.tar.gz
-  ```
+  TODO: Add the installation guide
 
 - Download audio file
 
@@ -20,23 +12,31 @@
   curl -LO https://huggingface.co/second-state/whisper-burn/resolve/main/audio16k.wav
   ```
 
+- Download whisper model file
+
+  ```bash
+  curl -sSf https://raw.githubusercontent.com/ggerganov/whisper.cpp/master/models/download-ggml-model.sh | bash -s -- base.en
+  ```
+
+  The model will be store at `./ggml-base.en.bin`
+
 - Download `whisper-api-server.wasm` binary
 
   ```bash
-  curl -LO https://github.com/LlamaEdge/whisper-api-server/raw/main/whisper-api-server.wasm
+  # specify the version of whisper-api-server
+  export version=0.2.0
+
+  # download the whisper-api-server.wasm binary
+  curl -LO https://github.com/LlamaEdge/whisper-api-server/releases/download/$version/whisper-api-server.wasm
   ```
 
 - Start `whisper-api-server`
 
   ```bash
   wasmedge --dir .:. \
-    --nn-preload default:Burn:CPU:tiny_en.mpk:tiny_en.cfg:tokenizer.json:en \
-    whisper-api-server.wasm
+    whisper-api-server.wasm \
+    --model ggml-base.en.bin
   ```
-
-  > [!NOTE]
-  > The `wasmedge-burn` plugin is required to run the `whisper-api-server.wasm` binary. See [Build plugin](https://hackmd.io/@vincent-2nd/SkI3Fh_S0#Build-plugin) to build the plugin from source.
-  > For Apple Silicon users, you can download the plugin [here](https://github.com/second-state/wasmedge-burn-plugin/raw/main/libwasmedgePluginWasiNN.dylib).
 
 - Send `curl` request to the transcriptions endpoint
 
@@ -67,10 +67,10 @@
   ```bash
   cd whisper-api-server
 
-  cargo build --release --target wasm32-wasi
+  cargo build --release
   ```
 
-  If the build is successful, you should see the `whisper-api-server.wasm` binary in the `target/wasm32-wasi/release` directory.
+  If the build is successful, you should see the `whisper-api-server.wasm` binary in the `target/wasm32-wasip1/release` directory.
 
 ## CLI Options
 
@@ -79,47 +79,13 @@ $ wasmedge whisper-api-server.wasm -h
 
 Whisper API Server
 
-Usage: whisper-api-server.wasm [OPTIONS]
+Usage: whisper-api-server.wasm [OPTIONS] --model <MODEL>
 
 Options:
-  -m, --model-name <MODEL_NAME>    Model name [default: default]
-      --model-alias <MODEL_ALIAS>  Model alias [default: default]
+  -n, --model-name <MODEL_NAME>    Model name [default: default]
+  -a, --model-alias <MODEL_ALIAS>  Model alias [default: default]
+  -m, --model <MODEL>              Path to the whisper model file
       --socket-addr <SOCKET_ADDR>  Socket address of Whisper API server instance [default: 0.0.0.0:8080]
   -h, --help                       Print help
   -V, --version                    Print version
 ```
-
-## Run with Docker
-
-  ```bash
-  ./docker-build.sh
-
-  docker run \
-    --runtime=io.containerd.wasmedge.v1 \
-    --platform=wasi/wasm \
-    --env WASMEDGE_WASINN_PRELOAD=default:Burn:GPU:/tiny_en.mpk:/tiny_en.cfg:/tokenizer.json:en \
-    -p 8080:8080 \
-    burn-whisper-server:latest
-  ```
-
-or 
-
-  ```
-  docker pull secondstate/burn-whisper-server:latest
-
-  docker run \
-    --runtime=io.containerd.wasmedge.v1 \
-    --platform=wasi/wasm \
-    --env WASMEDGE_WASINN_PRELOAD=default:Burn:GPU:/tiny_en.mpk:/tiny_en.cfg:/tokenizer.json:en \
-    -p 8080:8080 \
-    secondstate/burn-whisper-server:latest
-  ```
-
-Then
-
-  ```bash
-  curl http://localhost:8080/v1/audio/transcriptions \
-    -H "Content-Type: multipart/form-data" \
-    -F file="@audio16k.wav"
-  ```
-
