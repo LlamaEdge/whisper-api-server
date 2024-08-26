@@ -68,10 +68,12 @@ jobs:
       - name: Build api-server for linux
         id: build_api_server_linux
         if: startsWith(matrix.os, 'ubuntu')
+        env:
+          RUSTFLAGS: "--cfg wasmedge --cfg tokio_unstable"
         run: |
           cargo +nightly fmt --all -- --check
           cargo +nightly clippy --target wasm32-wasip1 -- -D warnings
-          cargo build --release
+          cargo build --target wasm32-wasip1 --release
 
       - name: Build api-server for macos
         id: build_api_server_macos
@@ -79,7 +81,8 @@ jobs:
         env:
           WASI_SDK_PATH: /Users/runner/work/whisper-api-server/whisper-api-server/wasi-sdk-24.0
           CC: "/Users/runner/work/whisper-api-server/whisper-api-server/wasi-sdk-24.0/bin/clang --sysroot=/Users/runner/work/whisper-api-server/whisper-api-server/wasi-sdk-24.0/share/wasi-sysroot"
+          RUSTFLAGS: "--cfg wasmedge --cfg tokio_unstable"
         run: |
           cargo +nightly fmt --all -- --check
           cargo +nightly clippy --target wasm32-wasip1 -- -D warnings
-          cargo build --release
+          cargo build --target wasm32-wasip1 --release
