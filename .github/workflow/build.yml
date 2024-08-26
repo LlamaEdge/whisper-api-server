@@ -1,0 +1,85 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+      - release-*
+      - feat-*
+      - ci-*
+      - refactor-*
+      - fix-*
+      - test-*
+    paths:
+      - ".github/workflows/build.yml"
+      - "**/Cargo.toml"
+      - "**/Cargo.lock"
+      - "**/*.rs"
+      - "**/*.sh"
+  pull_request:
+    branches:
+      - dev
+      - main
+    types: [opened, synchronize, reopened]
+    paths:
+      - ".github/workflows/**"
+      - "**/Cargo.toml"
+      - "**/*.rs"
+      - "**/*.sh"
+
+jobs:
+  build-wasm:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, macos-13, macos-14]
+    steps:
+      - name: Clone project
+        id: checkout
+        uses: actions/checkout@v3
+
+      - name: Install Rust-nightly
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: nightly
+          target: wasm32-wasip1
+          components: rustfmt, clippy
+
+      - name: Install Rust-stable
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          target: wasm32-wasip1
+
+      - name: Download wasi-sdk for x86_64-macos
+        if: matrix.os == 'macos-13'
+        run: |
+          curl -LO https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-24/wasi-sdk-24.0-x86_64-macos.tar.gz
+          tar -xzvf wasi-sdk-24.0-x86_64-macos.tar.gz
+          mv wasi-sdk-24.0-x86_64-macos wasi-sdk-24.0
+
+      - name: Download wasi-sdk for arm64-macos
+        if: matrix.os == 'macos-14'
+        run: |
+          curl -LO https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-24/wasi-sdk-24.0-arm64-macos.tar.gz
+          tar -xzvf wasi-sdk-24.0-arm64-macos.tar.gz
+          mv wasi-sdk-24.0-arm64-macos wasi-sdk-24.0
+
+      - name: Build api-server for linux
+        id: build_api_server_linux
+        if: startsWith(matrix.os, 'ubuntu')
+        run: |
+          cargo +nightly fmt --all -- --check
+          cargo +nightly clippy --target wasm32-wasip1 -- -D warnings
+          cargo build --release
+
+      - name: Build api-server for macos
+        id: build_api_server_macos
+        if: startsWith(matrix.os, 'macos')
+        env:
+          WASI_SDK_PATH: /Users/runner/work/whisper-api-server/whisper-api-server/wasi-sdk-24.0
+          CC: "/Users/runner/work/whisper-api-server/whisper-api-server/wasi-sdk-24.0/bin/clang --sysroot=/Users/runner/work/whisper-api-server/whisper-api-server/wasi-sdk-24.0/share/wasi-sysroot"
+        run: |
+          cargo +nightly fmt --all -- --check
+          cargo +nightly clippy --target wasm32-wasip1 -- -D warnings
+          cargo build --release
