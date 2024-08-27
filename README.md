@@ -6,20 +6,6 @@
 
   TODO: Add the installation guide
 
-- Download audio file
-
-  ```bash
-  curl -LO https://huggingface.co/second-state/whisper-burn/resolve/main/audio16k.wav
-  ```
-
-- Download whisper model file
-
-  ```bash
-  curl -sSf https://raw.githubusercontent.com/ggerganov/whisper.cpp/master/models/download-ggml-model.sh | bash -s -- base.en
-  ```
-
-  The model will be store at `./ggml-base.en.bin`
-
 - Download `whisper-api-server.wasm` binary
 
   ```bash
@@ -30,31 +16,53 @@
   curl -LO https://github.com/LlamaEdge/whisper-api-server/releases/download/$version/whisper-api-server.wasm
   ```
 
-- Start `whisper-api-server`
+- Download whisper model file
+
+  `ggml` whisper models are available from [https://huggingface.co/ggerganov/whisper.cpp/tree/main](https://huggingface.co/ggerganov/whisper.cpp/tree/main)
+
+  In the following command, `ggml-medium.bin` is downloaded as an example. You can replace it with other models.
 
   ```bash
-  wasmedge --dir .:. \
-    whisper-api-server.wasm \
-    --model ggml-base.en.bin
+  curl -LO https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-medium.bin
+  ```
+
+- Download audio file
+
+  ```bash
+  curl -LO https://github.com/second-state/WasmEdge-WASINN-examples/raw/master/whisper-basic/test.wav
+  ```
+
+- Start `whisper-api-server` on default `8080` port
+
+  ```bash
+  wasmedge --dir .:. whisper-api-server.wasm -m ggml-medium.bin
+  ```
+
+  To start the server on other port, use `--socket-addr` to specify the port you want to use, for example:
+
+  ```bash
+  wasmedge --dir .:. whisper-api-server.wasm -m ggml-medium.bin --socket-addr 0.0.0.0:10086
   ```
 
 - Send `curl` request to the transcriptions endpoint
 
   ```bash
-  curl http://localhost:8080/v1/audio/transcriptions \
-    -H "Content-Type: multipart/form-data" \
-    -F file="@audio16k.wav"
+  curl --location 'http://localhost:10086/v1/audio/transcriptions' \
+    --header 'Content-Type: multipart/form-data' \
+    --form 'file=@"/Users/sam/workspace/demo/whisper/wasmedge-demo/test.wav"'
   ```
 
-  If everything is set up correctly, you should see the transcriptions result:
+  If everything is set up correctly, you should see the following generated transcriptions:
 
   ```json
   {
-      "text": " Hello, I am the whisper machine learning model. If you see this as text then I am working properly."
+      "text": "[00:00:00.000 --> 00:00:03.540]  This is a test record for Whisper.cpp"
   }
   ```
 
 ## Build
+
+To build the `whisper-api-server.wasm` binary, you need to have the `Rust` toolchain installed. If you don't have it installed, you can install it by following the instructions on the [Rust website](https://www.rust-lang.org/tools/install).
 
 - Clone the repository
 
