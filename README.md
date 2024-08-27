@@ -64,6 +64,15 @@
 
 To build the `whisper-api-server.wasm` binary, you need to have the `Rust` toolchain installed. If you don't have it installed, you can install it by following the instructions on the [Rust website](https://www.rust-lang.org/tools/install).
 
+If you are working on macOS, you need to download the `wasi-sdk` from [https://github.com/WebAssembly/wasi-sdk/releases](https://github.com/WebAssembly/wasi-sdk/releases); and then, set the `WASI_SDK_PATH` environment variable to the path of the `wasi-sdk` directory, and set `CC` environment variable to the `clang` of `wasi-sdk`, for example:
+
+  ```bash
+  export WASI_SDK_PATH /path/to/wasi-sdk-22.0
+  export CC="${WASI_SDK_PATH}/bin/clang --sysroot=${WASI_SDK_PATH}/share/wasi-sysroot"
+  ```
+
+Now, you can build the `whisper-api-server.wasm` binary by following the steps below:
+
 - Clone the repository
 
   ```bash
