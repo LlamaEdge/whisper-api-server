@@ -33,7 +33,7 @@ pub(crate) fn internal_server_error(msg: impl AsRef<str>) -> Response<Body> {
         .unwrap()
 }
 
-pub(crate) fn _bad_request(msg: impl AsRef<str>) -> Response<Body> {
+pub(crate) fn bad_request(msg: impl AsRef<str>) -> Response<Body> {
     let err_msg = match msg.as_ref().is_empty() {
         true => "400 Bad Request".to_string(),
         false => format!("400 Bad Request: {}", msg.as_ref()),

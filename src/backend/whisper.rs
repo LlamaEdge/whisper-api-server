@@ -12,7 +12,7 @@ use std::{
 
 pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response<Body> {
     // log
-    info!(target: "stdout", "handling the coming audio transcription request");
+    info!(target: "stdout", "Handling the coming audio transcription request");
 
     let res = match *req.method() {
         Method::POST => {
@@ -236,7 +236,7 @@ pub(crate) async fn audio_transcriptions_handler(req: Request<Body>) -> Response
         }
     };
 
-    info!(target: "stdout", "send the audio transcription response");
+    info!(target: "stdout", "Send the audio transcription response");
 
     res
 }
