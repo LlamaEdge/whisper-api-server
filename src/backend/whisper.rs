@@ -180,7 +180,14 @@ pub(crate) async fn whisper_transcriptions_handler(req: Request<Body>) -> Respon
                     "response_format" => unimplemented!(),
                     "temperature" => unimplemented!(),
                     "timestamp_granularities" => unimplemented!(),
-                    _ => unimplemented!(),
+                    _ => {
+                        let err_msg = format!("Invalid field name: {}", &field.headers.name);
+
+                        // log
+                        error!(target: "stdout", "{}", &err_msg);
+
+                        return error::internal_server_error(err_msg);
+                    }
                 }
             }
 
@@ -502,7 +509,14 @@ pub(crate) async fn whisper_translations_handler(req: Request<Body>) -> Response
                         }
                     }
                     "language" => unimplemented!(),
-                    _ => unimplemented!(),
+                    _ => {
+                        let err_msg = format!("Invalid field name: {}", &field.headers.name);
+
+                        // log
+                        error!(target: "stdout", "{}", &err_msg);
+
+                        return error::internal_server_error(err_msg);
+                    }
                 }
             }
 
