@@ -1,5 +1,7 @@
 # test /v1/audio/transcriptions endpoint
 POST http://localhost:8080/v1/audio/transcriptions
 [MultipartFormData]
-field1: file,test.wav;
+file: file,test.wav;
 HTTP 200
+[Asserts]
+jsonpath "$.text" contains "This is a test record"
