@@ -2,18 +2,14 @@
 
 ## Quick Start
 
-- Install `WasmEdge v0.14.1` with `wasi_nn-whisper` plugin
+- Install `WasmEdge v0.14.1.rc-4` with `wasi_nn-whisper` plugin
 
   TODO: Add the installation guide
 
 - Download `whisper-api-server.wasm` binary
 
   ```bash
-  # specify the version of whisper-api-server
-  export version=0.2.0
-
-  # download the whisper-api-server.wasm binary
-  curl -LO https://github.com/LlamaEdge/whisper-api-server/releases/download/$version/whisper-api-server.wasm
+  curl -LO https://github.com/LlamaEdge/whisper-api-server/raw/feat-audio-speech/whisper-api-server.wasm
   ```
 
 - Download whisper model file
@@ -24,12 +20,6 @@
 
   ```bash
   curl -LO https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-medium.bin
-  ```
-
-- Download audio file
-
-  ```bash
-  curl -LO https://github.com/second-state/WasmEdge-WASINN-examples/raw/master/whisper-basic/test.wav
   ```
 
 - Start `whisper-api-server` on default `8080` port
@@ -44,12 +34,20 @@
   wasmedge --dir .:. whisper-api-server.wasm -m ggml-medium.bin --socket-addr 0.0.0.0:10086
   ```
 
+### Transcribe an audio file
+
+- Download audio file
+
+  ```bash
+  curl -LO https://github.com/second-state/WasmEdge-WASINN-examples/raw/master/whisper-basic/test.wav
+  ```
+
 - Send `curl` request to the transcriptions endpoint
 
   ```bash
   curl --location 'http://localhost:10086/v1/audio/transcriptions' \
     --header 'Content-Type: multipart/form-data' \
-    --form 'file=@"/Users/sam/workspace/demo/whisper/wasmedge-demo/test.wav"'
+    --form 'file=@"test.wav"'
   ```
 
   If everything is set up correctly, you should see the following generated transcriptions:
@@ -58,6 +56,22 @@
   {
       "text": "[00:00:00.000 --> 00:00:03.540]  This is a test record for Whisper.cpp"
   }
+  ```
+
+### Translate an audio file
+
+- Download audio file
+
+  ```bash
+  curl -LO https://github.com/second-state/WasmEdge-WASINN-examples/raw/master/whisper-basic/test.wav
+  ```
+
+- Send `curl` request to the translations endpoint
+
+  ```bash
+  curl --location 'http://localhost:10086/v1/audio/translations' \
+    --header 'Content-Type: multipart/form-data' \
+    --form 'file=@"test.wav"'
   ```
 
 ## Build
