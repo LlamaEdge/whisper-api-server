@@ -45,7 +45,7 @@
 - Send `curl` request to the transcriptions endpoint
 
   ```bash
-  curl --location 'http://localhost:10086/v1/audio/transcriptions' \
+  curl --location 'http://localhost:8080/v1/audio/transcriptions' \
     --header 'Content-Type: multipart/form-data' \
     --form 'file=@"test.wav"'
   ```
@@ -69,7 +69,7 @@
 - Send `curl` request to the translations endpoint
 
   ```bash
-  curl --location 'http://localhost:10086/v1/audio/translations' \
+  curl --location 'http://localhost:8080/v1/audio/translations' \
     --header 'Content-Type: multipart/form-data' \
     --form 'file=@"test.wav"'
   ```
