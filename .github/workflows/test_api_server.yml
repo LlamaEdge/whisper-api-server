@@ -60,7 +60,9 @@ jobs:
         run: |
           curl -LO https://github.com/WasmEdge/WasmEdge/releases/download/0.14.1-rc.4/WasmEdge-plugin-wasi_nn-whisper-0.14.1-rc.4-ubuntu20.04_x86_64.tar.gz
           tar -xzvf WasmEdge-plugin-wasi_nn-whisper-0.14.1-rc.4-ubuntu20.04_x86_64.tar.gz
+          mv libwasmedgePluginWasiNN.so $HOME/.wasmedge/plugin/
           ls -al
+          ls -al $HOME/.wasmedge/plugin/
 
       - name: Install Hurl
         run: |
@@ -73,11 +75,14 @@ jobs:
         run: |
           cargo build --release
           cp target/wasm32-wasip1/release/whisper-api-server.wasm ./whisper-api-server.wasm
+
       - name: Download model and audio files
         run: |
           curl -LO https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-medium.bin
-          curl -LO https://github.com/second-state/WasmEdge-WASINN-examples/raw/master/whisper-basic/test.wav
           ls -al
+          curl -LO https://github.com/second-state/WasmEdge-WASINN-examples/raw/master/whisper-basic/test.wav
+          mv test.wav ./tests/test.wav
+          ls -al ./tests
 
       - name: Start whisper-api-server
         run: |
