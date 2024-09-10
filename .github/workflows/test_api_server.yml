@@ -1,0 +1,94 @@
+name: Test Whisper API Server
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+      - release-*
+      - feat-*
+      - ci-*
+      - refactor-*
+      - fix-*
+      - test-*
+    paths:
+      - '.github/workflows/test_api_server.yml'
+      - '**/Cargo.toml'
+      - '**/*.rs'
+      - '**/*.sh'
+      - '**/.cargo/config.toml'
+  pull_request:
+    branches:
+      - dev
+      - main
+    types: [opened, synchronize, reopened]
+    paths:
+      - '.github/workflows/**'
+      - '**/Cargo.toml'
+      - '**/*.rs'
+      - '**/*.sh'
+
+jobs:
+  test-api-server:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        wasmedge_version: [0.14.1-rc.4]
+    steps:
+      - name: Clone project
+        id: checkout
+        uses: actions/checkout@v3
+
+      - name: Install Rust-nightly
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: nightly
+          target: wasm32-wasip1
+          components: rustfmt, clippy
+
+      - name: Install Rust-stable
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          target: wasm32-wasip1
+
+      - name: Install WasmEdge
+        run: |
+          curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install_v2.sh | bash -s -- -v ${{ matrix.wasmedge_version }}
+          ls -al $HOME/.wasmedge/bin
+
+      - name: Deploy whisper plugin
+        run: |
+          curl -LO https://github.com/WasmEdge/WasmEdge/releases/download/0.14.1-rc.4/WasmEdge-plugin-wasi_nn-whisper-0.14.1-rc.4-ubuntu20.04_x86_64.tar.gz
+          tar -xzvf WasmEdge-plugin-wasi_nn-whisper-0.14.1-rc.4-ubuntu20.04_x86_64.tar.gz
+          ls -al
+
+      - name: Install Hurl
+        run: |
+          curl --location --remote-name https://github.com/Orange-OpenSource/hurl/releases/download/5.0.1/hurl_5.0.1_amd64.deb
+          sudo apt update && sudo apt install ./hurl_5.0.1_amd64.deb
+
+      - name: Build whisper-api-server on linux
+        env:
+          RUSTFLAGS: "--cfg wasmedge --cfg tokio_unstable"
+        run: |
+          cargo build --release
+          cp target/wasm32-wasip1/release/whisper-api-server.wasm ./whisper-api-server.wasm
+      - name: Download model and audio files
+        run: |
+          curl -LO https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-medium.bin
+          curl -LO https://github.com/second-state/WasmEdge-WASINN-examples/raw/master/whisper-basic/test.wav
+          ls -al
+
+      - name: Start whisper-api-server
+        run: |
+          nohup $HOME/.wasmedge/bin/wasmedge --dir .:. whisper-api-server.wasm -m ggml-medium.bin > ./start-llamaedge.log 2>&1 &
+          sleep 5
+          cat start-llamaedge.log
+
+      - name: Run test
+        run: |
+          hurl --test --jobs 1 ./tests/*.hurl
+
+      - name: Stop llama-api-server
+        run: |
+          pkill -f wasmedge
