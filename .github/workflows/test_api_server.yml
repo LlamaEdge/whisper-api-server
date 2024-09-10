@@ -90,9 +90,13 @@ jobs:
           sleep 5
           cat start-llamaedge.log
 
-      - name: Run test
+      - name: Test transcriptions endpoint
         run: |
-          hurl --test --jobs 1 ./tests/*.hurl
+          hurl --test --jobs 1 ./tests/transcriptions.hurl
+
+      - name: Test translations endpoint
+        run: |
+          hurl --test --jobs 1 ./tests/translations.hurl
 
       - name: Stop llama-api-server
         run: |
