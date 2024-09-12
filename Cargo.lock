@@ -104,9 +104,9 @@ dependencies = [
 
 [[package]]
 name = "anyhow"
-version = "1.0.87"
+version = "1.0.88"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "10f00e1f6e58a40e807377c75c6a7f97bf9044fab57816f2414e6f5f4499d7b8"
+checksum = "4e1496f8fb1fbf272686b8d37f523dab3e4a7443300055e74cdaa449f3114356"
 
 [[package]]
 name = "arbitrary"
@@ -350,7 +350,7 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 [[package]]
 name = "chat-prompts"
 version = "0.13.0"
-source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=refactor-improve-audio-speech#e84d182a09af3a8390b0151cc5d6d623a0f02227"
+source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=refactor-improve-audio-speech#2ac07f7fe918acbbd1cbd9577a3c93acf7ca2bf6"
 dependencies = [
  "base64 0.22.0",
  "clap",
@@ -538,7 +538,7 @@ dependencies = [
 [[package]]
 name = "endpoints"
 version = "0.13.1"
-source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=refactor-improve-audio-speech#e84d182a09af3a8390b0151cc5d6d623a0f02227"
+source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=refactor-improve-audio-speech#2ac07f7fe918acbbd1cbd9577a3c93acf7ca2bf6"
 dependencies = [
  "indexmap",
  "serde",
@@ -1159,7 +1159,7 @@ checksum = "78b3ae25bc7c8c38cec158d1f2757ee79e9b3740fbc7ccf0e59e4b08d793fa89"
 [[package]]
 name = "llama-core"
 version = "0.16.1"
-source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=refactor-improve-audio-speech#e84d182a09af3a8390b0151cc5d6d623a0f02227"
+source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=refactor-improve-audio-speech#2ac07f7fe918acbbd1cbd9577a3c93acf7ca2bf6"
 dependencies = [
  "base64 0.22.0",
  "chat-prompts",
@@ -1898,9 +1898,9 @@ dependencies = [
 
 [[package]]
 name = "redox_syscall"
-version = "0.5.3"
+version = "0.5.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2a908a6e00f1fdd0dfd9c0eb08ce85126f6d8bbda50017e74bc4a4b7d4a926a4"
+checksum = "0884ad60e090bf1345b93da0a5de8923c93884cd03f40dfcfddd3b4bee661853"
 dependencies = [
  "bitflags 2.6.0",
 ]
@@ -2014,9 +2014,9 @@ checksum = "08d43f7aa6b08d49f382cde6a7982047c3426db949b1424bc4b7ec9ae12c6ce2"
 
 [[package]]
 name = "rustix"
-version = "0.38.36"
+version = "0.38.37"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3f55e80d50763938498dd5ebb18647174e0c76dc38c5505294bb224624f30f36"
+checksum = "8acb788b847c24f28525660c4d7758620a7210875711f79e7f663cc152726811"
 dependencies = [
  "bitflags 2.6.0",
  "errno",
@@ -2665,9 +2665,9 @@ checksum = "08f95100a766bf4f8f28f90d77e0a5461bbdb219042e7679bebe79004fed8d75"
 
 [[package]]
 name = "unicode-ident"
-version = "1.0.12"
+version = "1.0.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3354b9ac3fae1ff6755cb6db53683adb661634f67557942dea4facebec0fee4b"
+checksum = "e91b56cd4cadaeb79bbf1a5645f6b4f8dc5bde8834ad5894a8db35fda9efa1fe"
 
 [[package]]
 name = "unicode-normalization"
@@ -2967,8 +2967,11 @@ dependencies = [
 
 [[package]]
 name = "wasmedge_stable_diffusion"
-version = "0.2.0"
-source = "git+https://github.com/apepkuss/wasmedge-stable-diffusion.git?branch=feat-extend-BaseFunction#7e36cde851881c494e1137a84dcdccbfaa097f0c"
+version = "0.2.1"
+source = "git+https://github.com/apepkuss/wasmedge-stable-diffusion.git?branch=feat-extend-basefunction-trait#b98580b25a02d17c15bdf1cb7f6a2fd09570e7eb"
+dependencies = [
+ "thiserror",
+]
 
 [[package]]
 name = "wasmedge_wasi_socket"
