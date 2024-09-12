@@ -91,10 +91,12 @@ jobs:
 
       - name: Test transcriptions endpoint
         run: |
+          ls -al ./tests
           hurl --test --jobs 1 ./tests/transcriptions.hurl
 
       - name: Test translations endpoint
         run: |
+          ls -al ./tests
           hurl --test --jobs 1 ./tests/translations.hurl
 
       - name: Stop llama-api-server
