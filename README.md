@@ -75,6 +75,14 @@
     --form 'file=@"test.wav"'
   ```
 
+  If everything is set up correctly, you should see the following generated transcriptions:
+
+  ```json
+  {
+      "text":"[00:00:00.000 --> 00:00:03.900]  这里是中文广播。"
+  }
+  ```
+
 ## Build
 
 To build the `whisper-api-server.wasm` binary, you need to have the `Rust` toolchain installed. If you don't have it installed, you can install it by following the instructions on the [Rust website](https://www.rust-lang.org/tools/install).
