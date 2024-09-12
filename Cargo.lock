@@ -350,7 +350,7 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 [[package]]
 name = "chat-prompts"
 version = "0.13.0"
-source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=refactor-improve-audio-speech#2ac07f7fe918acbbd1cbd9577a3c93acf7ca2bf6"
+source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=dev#221497552d2ed2a6d645bde68382442dcae334c1"
 dependencies = [
  "base64 0.22.0",
  "clap",
@@ -538,7 +538,7 @@ dependencies = [
 [[package]]
 name = "endpoints"
 version = "0.13.1"
-source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=refactor-improve-audio-speech#2ac07f7fe918acbbd1cbd9577a3c93acf7ca2bf6"
+source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=dev#221497552d2ed2a6d645bde68382442dcae334c1"
 dependencies = [
  "indexmap",
  "serde",
@@ -1159,7 +1159,7 @@ checksum = "78b3ae25bc7c8c38cec158d1f2757ee79e9b3740fbc7ccf0e59e4b08d793fa89"
 [[package]]
 name = "llama-core"
 version = "0.16.1"
-source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=refactor-improve-audio-speech#2ac07f7fe918acbbd1cbd9577a3c93acf7ca2bf6"
+source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=dev#221497552d2ed2a6d645bde68382442dcae334c1"
 dependencies = [
  "base64 0.22.0",
  "chat-prompts",
