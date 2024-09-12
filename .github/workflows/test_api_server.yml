@@ -80,8 +80,7 @@ jobs:
         run: |
           curl -LO https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-medium.bin
           ls -al
-          curl -LO https://github.com/second-state/WasmEdge-WASINN-examples/raw/master/whisper-basic/test.wav
-          mv test.wav ./tests/test.wav
+          cp ./data/*.wav ./tests/
           ls -al ./tests
 
       - name: Start whisper-api-server
