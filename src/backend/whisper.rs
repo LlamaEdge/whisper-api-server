@@ -387,30 +387,19 @@ pub(crate) async fn whisper_translations_handler(req: Request<Body>) -> Response
                         };
                     }
                     "model" => {
-                        match field.is_text() {
-                            true => {
-                                let mut model = String::new();
+                        if field.is_text() {
+                            let mut model = String::new();
 
-                                if let Err(e) = field.data.read_to_string(&mut model) {
-                                    let err_msg = format!("Failed to read the model. {}", e);
-
-                                    // log
-                                    error!(target: "stdout", "{}", &err_msg);
-
-                                    return error::internal_server_error(err_msg);
-                                }
-
-                                request.model = model;
-                            }
-                            false => {
-                                let err_msg =
-                                    "Failed to get the model name. The model field in the request should be a text field.";
+                            if let Err(e) = field.data.read_to_string(&mut model) {
+                                let err_msg = format!("Failed to read the model. {}", e);
 
                                 // log
                                 error!(target: "stdout", "{}", &err_msg);
 
                                 return error::internal_server_error(err_msg);
                             }
+
+                            request.model = Some(model);
                         }
                     }
                     "prompt" => {
@@ -508,7 +497,33 @@ pub(crate) async fn whisper_translations_handler(req: Request<Body>) -> Response
                             }
                         }
                     }
-                    "language" => unimplemented!(),
+                    "language" => {
+                        match field.is_text() {
+                            true => {
+                                let mut language = String::new();
+
+                                if let Err(e) = field.data.read_to_string(&mut language) {
+                                    let err_msg = format!("Failed to read the prompt. {}", e);
+
+                                    // log
+                                    error!(target: "stdout", "{}", &err_msg);
+
+                                    return error::internal_server_error(err_msg);
+                                }
+
+                                request.prompt = Some(language);
+                            }
+                            false => {
+                                let err_msg =
+                                    "Failed to get the spoken language info. The language field in the request should be a text field.";
+
+                                // log
+                                error!(target: "stdout", "{}", &err_msg);
+
+                                return error::internal_server_error(err_msg);
+                            }
+                        }
+                    }
                     _ => {
                         let err_msg = format!("Invalid field name: {}", &field.headers.name);
 
