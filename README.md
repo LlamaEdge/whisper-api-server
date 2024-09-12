@@ -39,7 +39,8 @@
 - Download audio file
 
   ```bash
-  curl -LO https://github.com/second-state/WasmEdge-WASINN-examples/raw/master/whisper-basic/test.wav
+  curl -LO https://github.com/LlamaEdge/whisper-api-server/raw/main/data/test.wav
+
   ```
 
 - Send `curl` request to the transcriptions endpoint
@@ -63,7 +64,7 @@
 - Download audio file
 
   ```bash
-  curl -LO https://github.com/second-state/WasmEdge-WASINN-examples/raw/master/whisper-basic/test.wav
+  curl -LO https://github.com/LlamaEdge/whisper-api-server/raw/main/data/test_cn.wav
   ```
 
 - Send `curl` request to the translations endpoint
