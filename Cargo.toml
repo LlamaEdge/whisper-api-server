@@ -6,9 +6,9 @@ edition = "2021"
 [dependencies]
 anyhow = "1.0.80"
 clap = { version = "4.4.6", features = ["cargo"] }
-endpoints = { version = "=0.14.0" }
+endpoints = { version = "=0.14.1" }
 hyper = { version = "0.14", features = ["full"] }
-llama-core = { version = "=0.17.0", features = ["logging"] }
+llama-core = { version = "=0.17.1", features = ["logging"] }
 log = { version = "0.4.21", features = ["std", "kv", "kv_serde"] }
 multipart-2021 = "0.19.0"
 serde = { version = "1.0", features = ["derive"] }
