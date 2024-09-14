@@ -1,18 +1,38 @@
 # Whisper API Server
 
+This project is a RESTful API server that provides endpoints for transcribing and translating audio files. The APIs are compitable with OpenAI APIs of [transcriptions and translations](https://platform.openai.com/docs/api-reference/audio)
+
+> [!NOTE] The project is still under active development. The existing features still need to be improved and more features will be added in the future.
+
 ## Quick Start
 
-- Install `WasmEdge v0.14.1.rc-4` with `wasi_nn-whisper` plugin
+### Setup
 
-  TODO: Add the installation guide
+- Install `WasmEdge v0.14.1.rc-5` with `wasi_nn-whisper` plugin
+
+  ```bash
+  curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install_v2.sh | bash -s -- -v 0.14.1.rc-5
+  ```
+
+- Deploy `wasi_nn-whisper` plugin
+
+  ```bash
+  # Download whisper plugin for Mac Apple Silicon
+  curl -LO https://github.com/WasmEdge/WasmEdge/releases/download/0.14.1-rc.5/WasmEdge-plugin-wasi_nn-whisper-0.14.1-rc.5-darwin_arm64.tar.gz
+
+  # Unzip the plugin to $HOME/.wasmedge/plugin
+  tar -xzf WasmEdge-plugin-wasi_nn-whisper-0.14.1-rc.5-darwin_arm64.tar.gz -C $HOME/.wasmedge/plugin
+  ```
+
+### Run whisper-api-server
 
 - Download `whisper-api-server.wasm` binary
 
   ```bash
-  curl -LO https://github.com/LlamaEdge/whisper-api-server/raw/feat-audio-speech/whisper-api-server.wasm
+  curl -LO https://github.com/LlamaEdge/whisper-api-server/releases/latest/download/whisper-api-server.wasm
   ```
 
-- Download whisper model file
+- Download model
 
   `ggml` whisper models are available from [https://huggingface.co/ggerganov/whisper.cpp/tree/main](https://huggingface.co/ggerganov/whisper.cpp/tree/main)
 
@@ -22,7 +42,7 @@
   curl -LO https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-medium.bin
   ```
 
-- Start `whisper-api-server` on default `8080` port
+- Start server
 
   ```bash
   wasmedge --dir .:. whisper-api-server.wasm -m ggml-medium.bin
@@ -34,7 +54,9 @@
   wasmedge --dir .:. whisper-api-server.wasm -m ggml-medium.bin --socket-addr 0.0.0.0:10086
   ```
 
-### Transcribe an audio file
+### Usage
+
+#### Transcribe an audio file
 
 - Download audio file
 
@@ -59,7 +81,7 @@
   }
   ```
 
-### Translate an audio file
+#### Translate an audio file
 
 - Download audio file
 
