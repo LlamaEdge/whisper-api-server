@@ -102,7 +102,7 @@ This project is a RESTful API server that provides endpoints for transcribing an
 
   ```json
   {
-      "text":"[00:00:00.000 --> 00:00:03.900]  这里是中文广播。"
+    "text": "[00:00:00.000 --> 00:00:04.000]  这里是中文广播 This is a Chinese broadcast."
   }
   ```
 
