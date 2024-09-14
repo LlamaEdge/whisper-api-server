@@ -535,6 +535,8 @@ pub(crate) async fn whisper_translations_handler(req: Request<Body>) -> Response
                 }
             }
 
+            info!(target: "stdout", "Request: {:?}", &request);
+
             let obj = match llama_core::audio::audio_translations(request).await {
                 Ok(obj) => obj,
                 Err(e) => {
