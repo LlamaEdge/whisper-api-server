@@ -90,6 +90,8 @@ This project is a RESTful API server that provides endpoints for transcribing an
   curl -LO https://github.com/LlamaEdge/whisper-api-server/raw/main/data/test_cn.wav
   ```
 
+  This audio contains a Chinese sentence, `这里是中文广播`, the English meaning is `This is a Chinese broadcast`.
+
 - Send `curl` request to the translations endpoint
 
   ```bash
