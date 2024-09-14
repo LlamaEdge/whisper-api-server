@@ -511,7 +511,7 @@ pub(crate) async fn whisper_translations_handler(req: Request<Body>) -> Response
                                     return error::internal_server_error(err_msg);
                                 }
 
-                                request.prompt = Some(language);
+                                request.language = Some(language);
                             }
                             false => {
                                 let err_msg =
