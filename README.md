@@ -96,13 +96,14 @@ This project is a RESTful API server that provides endpoints for transcribing an
   curl --location 'http://localhost:8080/v1/audio/translations' \
     --header 'Content-Type: multipart/form-data' \
     --form 'file=@"test.wav"'
+    --form 'language="cn"'
   ```
 
   If everything is set up correctly, you should see the following generated transcriptions:
 
   ```json
   {
-    "text": "[00:00:00.000 --> 00:00:04.000]  这里是中文广播 This is a Chinese broadcast."
+    "text": "[00:00:00.000 --> 00:00:04.000]  This is a Chinese broadcast."
   }
   ```
 
