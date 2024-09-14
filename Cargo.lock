@@ -349,8 +349,9 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
 name = "chat-prompts"
-version = "0.13.0"
-source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=dev#221497552d2ed2a6d645bde68382442dcae334c1"
+version = "0.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7bef02728dfb6d09320872300ed520d5c3ce475350737c13b911693a78981817"
 dependencies = [
  "base64 0.22.0",
  "clap",
@@ -537,8 +538,9 @@ dependencies = [
 
 [[package]]
 name = "endpoints"
-version = "0.13.1"
-source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=dev#221497552d2ed2a6d645bde68382442dcae334c1"
+version = "0.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4a2d90a9f3f2b6751f4147a74656bc2e7ab8ea335855d4e2d038f3e585b4c58e"
 dependencies = [
  "indexmap",
  "serde",
@@ -1158,8 +1160,9 @@ checksum = "78b3ae25bc7c8c38cec158d1f2757ee79e9b3740fbc7ccf0e59e4b08d793fa89"
 
 [[package]]
 name = "llama-core"
-version = "0.16.1"
-source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=dev#221497552d2ed2a6d645bde68382442dcae334c1"
+version = "0.17.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "156a38c440d6631239da34d1140df1704ec897082f9898f0bef6829b63c888e8"
 dependencies = [
  "base64 0.22.0",
  "chat-prompts",
@@ -1466,9 +1469,9 @@ dependencies = [
 
 [[package]]
 name = "once_cell"
-version = "1.19.0"
+version = "1.20.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3fdb12b2476b595f9358c5161aa467c2438859caa136dec86c26fdd2efe17b92"
+checksum = "33ea5043e58958ee56f3e15a90aee535795cd7dfd319846288d93c5b57d85cbe"
 
 [[package]]
 name = "parking_lot"
@@ -2680,9 +2683,9 @@ dependencies = [
 
 [[package]]
 name = "unicode-segmentation"
-version = "1.11.0"
+version = "1.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d4c87d22b6e3f4a18d4d40ef354e97c90fcb14dd91d7dc0aa9d8a1172ebf7202"
+checksum = "f6ccf251212114b54433ec949fd6a7841275f9ada20dddd2f29e9ceea4501493"
 
 [[package]]
 name = "unicode-xid"
@@ -2968,7 +2971,8 @@ dependencies = [
 [[package]]
 name = "wasmedge_stable_diffusion"
 version = "0.2.1"
-source = "git+https://github.com/apepkuss/wasmedge-stable-diffusion.git?branch=feat-extend-basefunction-trait#b98580b25a02d17c15bdf1cb7f6a2fd09570e7eb"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f8fb1b65c6fd223a48f25348c20c7a26d9b7bcec82ba80ac95bd31c78992edad"
 dependencies = [
  "thiserror",
 ]
@@ -3020,7 +3024,7 @@ checksum = "53a85b86a771b1c87058196170769dd264f66c0782acf1ae6cc51bfd64b39082"
 
 [[package]]
 name = "whisper-api-server"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "anyhow",
  "clap",
