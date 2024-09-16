@@ -12,7 +12,7 @@ This project is a RESTful API server that provides endpoints for transcribing an
 - Install `WasmEdge v0.14.1.rc-5` with `wasi_nn-whisper` plugin
 
   ```bash
-  curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install_v2.sh | bash -s -- -v 0.14.1.rc-5
+  curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install_v2.sh | bash -s -- -v 0.14.1-rc.5
   ```
 
 - Deploy `wasi_nn-whisper` plugin
