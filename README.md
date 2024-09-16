@@ -97,7 +97,7 @@ This project is a RESTful API server that provides endpoints for transcribing an
   ```bash
   curl --location 'http://localhost:8080/v1/audio/translations' \
     --header 'Content-Type: multipart/form-data' \
-    --form 'file=@"test.wav"'
+    --form 'file=@"test.wav"' \
     --form 'language="cn"'
   ```
 
