@@ -36,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        wasmedge_version: [0.14.1-rc.5]
+        wasmedge_version: [0.14.1]
     steps:
       - name: Clone project
         id: checkout
