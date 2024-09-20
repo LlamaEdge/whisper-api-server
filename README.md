@@ -9,20 +9,20 @@ This project is a RESTful API server that provides endpoints for transcribing an
 
 ### Setup
 
-- Install `WasmEdge v0.14.1.rc-5` with `wasi_nn-whisper` plugin
+- Install `WasmEdge v0.14.1` with `wasi_nn-whisper` plugin
 
   ```bash
-  curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install_v2.sh | bash -s -- -v 0.14.1-rc.5
+  curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install_v2.sh | bash -s -- -v 0.14.1
   ```
 
 - Deploy `wasi_nn-whisper` plugin
 
   ```bash
   # Download whisper plugin for Mac Apple Silicon
-  curl -LO https://github.com/WasmEdge/WasmEdge/releases/download/0.14.1-rc.5/WasmEdge-plugin-wasi_nn-whisper-0.14.1-rc.5-darwin_arm64.tar.gz
+  curl -LO https://github.com/WasmEdge/WasmEdge/releases/download/0.14.1/WasmEdge-plugin-wasi_nn-whisper-0.14.1-darwin_arm64.tar.gz
 
   # Unzip the plugin to $HOME/.wasmedge/plugin
-  tar -xzf WasmEdge-plugin-wasi_nn-whisper-0.14.1-rc.5-darwin_arm64.tar.gz -C $HOME/.wasmedge/plugin
+  tar -xzf WasmEdge-plugin-wasi_nn-whisper-0.14.1-darwin_arm64.tar.gz -C $HOME/.wasmedge/plugin
   ```
 
 ### Run whisper-api-server
@@ -30,7 +30,7 @@ This project is a RESTful API server that provides endpoints for transcribing an
 - Download `whisper-api-server.wasm` binary
 
   ```bash
-  curl -LO https://github.com/LlamaEdge/whisper-api-server/releases/download/0.2.1/whisper-api-server.wasm
+  curl -LO https://github.com/LlamaEdge/whisper-api-server/releases/download/0.2.2/whisper-api-server.wasm
   ```
 
 - Download model
