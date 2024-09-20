@@ -151,6 +151,7 @@ Options:
   -n, --model-name <MODEL_NAME>    Model name [default: default]
   -a, --model-alias <MODEL_ALIAS>  Model alias [default: default]
   -m, --model <MODEL>              Path to the whisper model file
+      --socket-addr <SOCKET_ADDR>  Socket address of LlamaEdge API Server instance. For example, `0.0.0.0:8080`
       --port <PORT>                Port number [default: 8080]
   -h, --help                       Print help
   -V, --version                    Print version
