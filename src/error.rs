@@ -74,9 +74,6 @@ pub(crate) fn invalid_endpoint(msg: impl AsRef<str>) -> Response<Body> {
 
 #[derive(Error, Clone, Debug, PartialEq, Eq)]
 pub enum ServerError {
-    /// Error returned while parsing socket address failed
-    #[error("Failed to parse socket address: {0}")]
-    SocketAddr(String),
     /// Generic error returned while performing an operation
     #[error("{0}")]
     Operation(String),
