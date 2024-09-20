@@ -19,8 +19,8 @@ use tokio::net::TcpListener;
 
 type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
 
-// default socket address of LlamaEdge API Server instance
-const DEFAULT_SOCKET_ADDRESS: &str = "0.0.0.0:8080";
+// default port
+const DEFAULT_PORT: &str = "8080";
 
 #[derive(Debug, Parser)]
 #[command(name = "Whisper API Server", version = env!("CARGO_PKG_VERSION"), author = env!("CARGO_PKG_AUTHORS"), about = "Whisper API Server")]
@@ -34,9 +34,9 @@ struct Cli {
     /// Path to the whisper model file
     #[arg(short = 'm', long)]
     model: PathBuf,
-    /// Socket address of Whisper API server instance
-    #[arg(long, default_value = DEFAULT_SOCKET_ADDRESS)]
-    socket_addr: String,
+    /// Port number
+    #[arg(long, default_value = DEFAULT_PORT, value_parser = clap::value_parser!(u16))]
+    port: u16,
 }
 
 #[tokio::main(flavor = "current_thread")]
@@ -80,14 +80,7 @@ async fn main() -> Result<(), ServerError> {
     llama_core::init_whisper_context(&metadata, &cli.model)
         .map_err(|e| ServerError::Operation(e.to_string()))?;
 
-    // socket address
-    let addr = cli
-        .socket_addr
-        .parse::<SocketAddr>()
-        .map_err(|e| ServerError::SocketAddr(e.to_string()))?;
-
-    // log socket address
-    info!(target: "stdout", "socket_address: {}", addr.to_string());
+    let addr = format!("127.0.0.1:{}", cli.port);
 
     let new_service = make_service_fn(move |conn: &AddrStream| {
         // log socket address
@@ -100,7 +93,9 @@ async fn main() -> Result<(), ServerError> {
         async move { Ok::<_, Error>(service_fn(handle_request)) }
     });
 
-    let tcp_listener = TcpListener::bind(addr).await.unwrap();
+    let tcp_listener = TcpListener::bind(&addr).await.unwrap();
+    info!(target: "stdout", "Listening on {}", addr);
+
     let server = Server::from_tcp(tcp_listener.into_std().unwrap())
         .unwrap()
         .serve(new_service);
