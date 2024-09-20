@@ -5,7 +5,7 @@ mod backend;
 mod error;
 
 use anyhow::Result;
-use clap::Parser;
+use clap::{ArgGroup, Parser};
 use error::ServerError;
 use hyper::{
     body::HttpBody,
@@ -14,7 +14,7 @@ use hyper::{
     Body, Request, Response, Server,
 };
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
+use std::{net::SocketAddr, path::PathBuf};
 use tokio::net::TcpListener;
 
 type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
@@ -24,6 +24,7 @@ const DEFAULT_PORT: &str = "8080";
 
 #[derive(Debug, Parser)]
 #[command(name = "Whisper API Server", version = env!("CARGO_PKG_VERSION"), author = env!("CARGO_PKG_AUTHORS"), about = "Whisper API Server")]
+#[command(group = ArgGroup::new("socket_address_group").multiple(false).args(&["socket_addr", "port"]))]
 struct Cli {
     /// Model name.
     #[arg(short = 'n', long, default_value = "default")]
@@ -34,8 +35,11 @@ struct Cli {
     /// Path to the whisper model file
     #[arg(short = 'm', long)]
     model: PathBuf,
+    /// Socket address of LlamaEdge API Server instance. For example, `0.0.0.0:8080`.
+    #[arg(long, default_value = None, value_parser = clap::value_parser!(SocketAddr), group = "socket_address_group")]
+    socket_addr: Option<SocketAddr>,
     /// Port number
-    #[arg(long, default_value = DEFAULT_PORT, value_parser = clap::value_parser!(u16))]
+    #[arg(long, default_value = DEFAULT_PORT, value_parser = clap::value_parser!(u16), group = "socket_address_group")]
     port: u16,
 }
 
@@ -80,7 +84,11 @@ async fn main() -> Result<(), ServerError> {
     llama_core::init_whisper_context(&metadata, &cli.model)
         .map_err(|e| ServerError::Operation(e.to_string()))?;
 
-    let addr = format!("127.0.0.1:{}", cli.port);
+    // socket address
+    let addr = match cli.socket_addr {
+        Some(addr) => addr,
+        None => SocketAddr::from(([0, 0, 0, 0], cli.port)),
+    };
 
     let new_service = make_service_fn(move |conn: &AddrStream| {
         // log socket address
@@ -93,7 +101,7 @@ async fn main() -> Result<(), ServerError> {
         async move { Ok::<_, Error>(service_fn(handle_request)) }
     });
 
-    let tcp_listener = TcpListener::bind(&addr).await.unwrap();
+    let tcp_listener = TcpListener::bind(addr).await.unwrap();
     info!(target: "stdout", "Listening on {}", addr);
 
     let server = Server::from_tcp(tcp_listener.into_std().unwrap())
