@@ -350,12 +350,7 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 [[package]]
 name = "chat-prompts"
 version = "0.15.0"
-<<<<<<< HEAD
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "85407a927d2273a1ce8eda37ce05d9f0ad19715e382dbc24e215826f61c1ec5e"
-=======
 source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=feat-new-whisper-metadata#1d86e2920ceb324f1b0d3e881d631ad45c264a48"
->>>>>>> a1c0e51 (chore: update deps)
 dependencies = [
  "base64 0.22.1",
  "clap",
@@ -543,12 +538,7 @@ dependencies = [
 [[package]]
 name = "endpoints"
 version = "0.14.2"
-<<<<<<< HEAD
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6bad32e58e8d63049a889e9d879832c02f3da107ba8902a7e485a206c3720c1d"
-=======
 source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=feat-new-whisper-metadata#1d86e2920ceb324f1b0d3e881d631ad45c264a48"
->>>>>>> a1c0e51 (chore: update deps)
 dependencies = [
  "indexmap",
  "serde",
@@ -1169,12 +1159,7 @@ checksum = "78b3ae25bc7c8c38cec158d1f2757ee79e9b3740fbc7ccf0e59e4b08d793fa89"
 [[package]]
 name = "llama-core"
 version = "0.17.2"
-<<<<<<< HEAD
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "51284f8ef814ae135536b88eae44a31abe57cf9a0d69308ac89584a65f9d6683"
-=======
 source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=feat-new-whisper-metadata#1d86e2920ceb324f1b0d3e881d631ad45c264a48"
->>>>>>> a1c0e51 (chore: update deps)
 dependencies = [
  "base64 0.22.1",
  "chat-prompts",
