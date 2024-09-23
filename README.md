@@ -30,7 +30,7 @@ This project is a RESTful API server that provides endpoints for transcribing an
 - Download `whisper-api-server.wasm` binary
 
   ```bash
-  curl -LO https://github.com/LlamaEdge/whisper-api-server/releases/download/0.2.2/whisper-api-server.wasm
+  curl -LO https://github.com/LlamaEdge/whisper-api-server/releases/download/0.3.0/whisper-api-server.wasm
   ```
 
 - Download model
