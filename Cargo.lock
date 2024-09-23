@@ -220,9 +220,9 @@ checksum = "9d297deb1925b89f2ccc13d7635fa0714f12c87adce1c75356b39ca9b7178567"
 
 [[package]]
 name = "base64"
-version = "0.22.0"
+version = "0.22.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9475866fec1451be56a3c2400fd081ff546538961565ccb5b7142cbd22bc7a51"
+checksum = "72b3254f16251a8381aa12e40e3c4d2f0199f8c6508fbecb9d91f575e0fbb8c6"
 
 [[package]]
 name = "bit-set"
@@ -349,11 +349,11 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
 name = "chat-prompts"
-version = "0.14.1"
+version = "0.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f7d021658a4e41f0a95bc5cc3baa2826117b1890cd6a87cb5ead4b87c97d5b95"
+checksum = "85407a927d2273a1ce8eda37ce05d9f0ad19715e382dbc24e215826f61c1ec5e"
 dependencies = [
- "base64 0.22.0",
+ "base64 0.22.1",
  "clap",
  "endpoints",
  "enum_dispatch",
@@ -538,9 +538,9 @@ dependencies = [
 
 [[package]]
 name = "endpoints"
-version = "0.14.1"
+version = "0.14.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a340e96463e66b1f50c63e9ef1491a6a090565630d48356a0e175686a3748694"
+checksum = "6bad32e58e8d63049a889e9d879832c02f3da107ba8902a7e485a206c3720c1d"
 dependencies = [
  "indexmap",
  "serde",
@@ -1160,11 +1160,11 @@ checksum = "78b3ae25bc7c8c38cec158d1f2757ee79e9b3740fbc7ccf0e59e4b08d793fa89"
 
 [[package]]
 name = "llama-core"
-version = "0.17.1"
+version = "0.17.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e69349c9b8419e926a9fec58c003516cb004ed265417056fc4db1bbf9af6da4f"
+checksum = "51284f8ef814ae135536b88eae44a31abe57cf9a0d69308ac89584a65f9d6683"
 dependencies = [
- "base64 0.22.0",
+ "base64 0.22.1",
  "chat-prompts",
  "either",
  "endpoints",
