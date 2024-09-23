@@ -61,8 +61,8 @@ jobs:
 
       - name: Deploy whisper plugin
         run: |
-          curl -LO https://github.com/WasmEdge/WasmEdge/releases/download/0.14.1-rc.5/WasmEdge-plugin-wasi_nn-whisper-0.14.1-rc.5-ubuntu20.04_x86_64.tar.gz
-          tar -xzvf WasmEdge-plugin-wasi_nn-whisper-0.14.1-rc.5-ubuntu20.04_x86_64.tar.gz
+          curl -LO https://github.com/WasmEdge/WasmEdge/releases/download/${{ matrix.wasmedge_version }}/WasmEdge-plugin-wasi_nn-whisper-${{ matrix.wasmedge_version }}-ubuntu20.04_x86_64.tar.gz
+          tar -xzvf WasmEdge-plugin-wasi_nn-whisper-${{ matrix.wasmedge_version }}-ubuntu20.04_x86_64.tar.gz
           mv libwasmedgePluginWasiNN.so $HOME/.wasmedge/plugin/
           ls -al
           ls -al $HOME/.wasmedge/plugin/
