@@ -349,8 +349,8 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
 name = "chat-prompts"
-version = "0.15.0"
-source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=feat-new-whisper-metadata#1d86e2920ceb324f1b0d3e881d631ad45c264a48"
+version = "0.16.0"
+source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=dev#fc38a03a510d082fdcdbf9fde0f9e41077c7e14d"
 dependencies = [
  "base64 0.22.1",
  "clap",
@@ -538,7 +538,7 @@ dependencies = [
 [[package]]
 name = "endpoints"
 version = "0.14.2"
-source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=feat-new-whisper-metadata#1d86e2920ceb324f1b0d3e881d631ad45c264a48"
+source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=dev#fc38a03a510d082fdcdbf9fde0f9e41077c7e14d"
 dependencies = [
  "indexmap",
  "serde",
@@ -1158,8 +1158,8 @@ checksum = "78b3ae25bc7c8c38cec158d1f2757ee79e9b3740fbc7ccf0e59e4b08d793fa89"
 
 [[package]]
 name = "llama-core"
-version = "0.17.2"
-source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=feat-new-whisper-metadata#1d86e2920ceb324f1b0d3e881d631ad45c264a48"
+version = "0.18.0"
+source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=dev#fc38a03a510d082fdcdbf9fde0f9e41077c7e14d"
 dependencies = [
  "base64 0.22.1",
  "chat-prompts",
@@ -2967,9 +2967,9 @@ dependencies = [
 
 [[package]]
 name = "wasmedge_stable_diffusion"
-version = "0.2.1"
+version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f8fb1b65c6fd223a48f25348c20c7a26d9b7bcec82ba80ac95bd31c78992edad"
+checksum = "3aa2bb892d5a35a4bd384d163380aa24df0df6f64a348e989fe42cc47bc100cf"
 dependencies = [
  "thiserror",
 ]
