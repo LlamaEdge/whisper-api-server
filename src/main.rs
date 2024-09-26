@@ -45,8 +45,10 @@ struct Cli {
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<(), ServerError> {
-    // get the environment variable `RUST_LOG`
-    let rust_log = std::env::var("RUST_LOG").unwrap_or_default().to_lowercase();
+    // get the environment variable `LLAMA_LOG`
+    let rust_log = std::env::var("LLAMA_LOG")
+        .unwrap_or_default()
+        .to_lowercase();
     let (_, log_level) = match rust_log.is_empty() {
         true => ("stdout", LogLevel::Info),
         false => match rust_log.split_once("=") {
