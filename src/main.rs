@@ -43,6 +43,7 @@ struct Cli {
     port: u16,
 }
 
+#[allow(clippy::needless_return)]
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<(), ServerError> {
     // get the environment variable `LLAMA_LOG`
