@@ -78,10 +78,13 @@ async fn main() -> Result<(), ServerError> {
     info!(target: "stdout", "model path: {}", cli.model.display());
 
     // create a Metadata instance
-    let metadata = llama_core::WhisperMetadataBuilder::new(&cli.model_name, &cli.model_alias)
-        .enable_plugin_log(true)
-        .enable_debug_log(true)
-        .build();
+    let metadata = llama_core::metadata::whisper::WhisperMetadataBuilder::new(
+        &cli.model_name,
+        &cli.model_alias,
+    )
+    .enable_plugin_log(true)
+    .enable_debug_log(true)
+    .build();
 
     // init the audio context
     llama_core::init_whisper_context(&metadata, &cli.model)
