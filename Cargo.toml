@@ -6,11 +6,11 @@ edition = "2021"
 [dependencies]
 anyhow = "1.0.80"
 clap = { version = "4.4.6", features = ["cargo"] }
-endpoints = { version = "=0.15.1", git = "https://github.com/LlamaEdge/LlamaEdge.git", branch = "feat-support-piper" }
+endpoints = { version = "=0.15.1", git = "https://github.com/LlamaEdge/LlamaEdge.git", branch = "dev" }
 hyper = { version = "0.14", features = ["full"] }
 llama-core = { version = "=0.19.4", features = [
     "logging",
-], git = "https://github.com/LlamaEdge/LlamaEdge.git", branch = "feat-support-piper" }
+], git = "https://github.com/LlamaEdge/LlamaEdge.git", branch = "dev" }
 log = { version = "0.4.21", features = ["std", "kv", "kv_serde"] }
 multipart-2021 = "0.19.0"
 serde = { version = "1.0", features = ["derive"] }
