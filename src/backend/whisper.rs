@@ -175,10 +175,73 @@ pub(crate) async fn whisper_transcriptions_handler(req: Request<Body>) -> Respon
                             }
                         }
                     }
-                    "language" => unimplemented!(),
+                    "language" => match field.is_text() {
+                        true => {
+                            let mut language = String::new();
+
+                            if let Err(e) = field.data.read_to_string(&mut language) {
+                                let err_msg = format!("Failed to read the prompt. {}", e);
+
+                                // log
+                                error!(target: "stdout", "{}", &err_msg);
+
+                                return error::internal_server_error(err_msg);
+                            }
+
+                            request.language = Some(language);
+                        }
+                        false => {
+                            let err_msg =
+                                "Failed to get the spoken language info. The language field in the request should be a text field.";
+
+                            // log
+                            error!(target: "stdout", "{}", &err_msg);
+
+                            return error::internal_server_error(err_msg);
+                        }
+                    },
                     "prompt" => unimplemented!(),
                     "response_format" => unimplemented!(),
-                    "temperature" => unimplemented!(),
+                    "temperature" => {
+                        match field.is_text() {
+                            true => {
+                                let mut temperature = String::new();
+
+                                if let Err(e) = field.data.read_to_string(&mut temperature) {
+                                    let err_msg = format!("Failed to read the temperature. {}", e);
+
+                                    // log
+                                    error!(target: "stdout", "{}", &err_msg);
+
+                                    return error::internal_server_error(err_msg);
+                                }
+
+                                match temperature.trim().parse::<f64>() {
+                                    Ok(temp) => {
+                                        request.temperature = Some(temp);
+                                    }
+                                    Err(e) => {
+                                        let err_msg =
+                                            format!("Failed to parse the temperature. {}", e);
+
+                                        // log
+                                        error!(target: "stdout", "{}", &err_msg);
+
+                                        return error::internal_server_error(err_msg);
+                                    }
+                                }
+                            }
+                            false => {
+                                let err_msg =
+                                    "Failed to get the temperature. The temperature field in the request should be a text field.";
+
+                                // log
+                                error!(target: "stdout", "{}", &err_msg);
+
+                                return error::internal_server_error(err_msg);
+                            }
+                        }
+                    }
                     "timestamp_granularities" => unimplemented!(),
                     _ => {
                         let err_msg = format!("Invalid field name: {}", &field.headers.name);
