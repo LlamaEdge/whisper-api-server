@@ -200,7 +200,31 @@ pub(crate) async fn whisper_transcriptions_handler(req: Request<Body>) -> Respon
                             return error::internal_server_error(err_msg);
                         }
                     },
-                    "prompt" => unimplemented!(),
+                    "prompt" => match field.is_text() {
+                        true => {
+                            let mut prompt = String::new();
+
+                            if let Err(e) = field.data.read_to_string(&mut prompt) {
+                                let err_msg = format!("Failed to read the prompt. {}", e);
+
+                                // log
+                                error!(target: "stdout", "{}", &err_msg);
+
+                                return error::internal_server_error(err_msg);
+                            }
+
+                            request.prompt = Some(prompt);
+                        }
+                        false => {
+                            let err_msg =
+                                "Failed to get the prompt. The prompt field in the request should be a text field.";
+
+                            // log
+                            error!(target: "stdout", "{}", &err_msg);
+
+                            return error::internal_server_error(err_msg);
+                        }
+                    },
                     "response_format" => unimplemented!(),
                     "temperature" => {
                         match field.is_text() {
@@ -243,6 +267,82 @@ pub(crate) async fn whisper_transcriptions_handler(req: Request<Body>) -> Respon
                         }
                     }
                     "timestamp_granularities" => unimplemented!(),
+                    "detect_language" => unimplemented!(),
+                    "offset_time" => unimplemented!(),
+                    "duration" => unimplemented!(),
+                    "max_context" => unimplemented!(),
+                    "max_len" => match field.is_text() {
+                        true => {
+                            let mut max_len: String = String::new();
+
+                            if let Err(e) = field.data.read_to_string(&mut max_len) {
+                                let err_msg = format!("Failed to read `max_len`. {}", e);
+
+                                // log
+                                error!(target: "stdout", "{}", &err_msg);
+
+                                return error::internal_server_error(err_msg);
+                            }
+
+                            match max_len.parse::<u32>() {
+                                Ok(max_len) => request.max_len = Some(max_len),
+                                Err(e) => {
+                                    let err_msg =
+                                        format!("Failed to parse `max_len`. Reason: {}", e);
+
+                                    // log
+                                    error!(target: "stdout", "{}", &err_msg);
+
+                                    return error::bad_request(err_msg);
+                                }
+                            }
+                        }
+                        false => {
+                            let err_msg =
+                                "Failed to get `max_len`. The `max_len` field in the request should be a text field.";
+
+                            // log
+                            error!(target: "stdout", "{}", &err_msg);
+
+                            return error::internal_server_error(err_msg);
+                        }
+                    },
+                    "split_on_word" => match field.is_text() {
+                        true => {
+                            let mut split_on_word: String = String::new();
+
+                            if let Err(e) = field.data.read_to_string(&mut split_on_word) {
+                                let err_msg = format!("Failed to read `split_on_word`. {}", e);
+
+                                // log
+                                error!(target: "stdout", "{}", &err_msg);
+
+                                return error::internal_server_error(err_msg);
+                            }
+
+                            match split_on_word.parse::<bool>() {
+                                Ok(split_on_word) => request.split_on_word = Some(split_on_word),
+                                Err(e) => {
+                                    let err_msg =
+                                        format!("Failed to parse `split_on_word`. Reason: {}", e);
+
+                                    // log
+                                    error!(target: "stdout", "{}", &err_msg);
+
+                                    return error::bad_request(err_msg);
+                                }
+                            }
+                        }
+                        false => {
+                            let err_msg =
+                                "Failed to get `split_on_word`. The `split_on_word` field in the request should be a text field.";
+
+                            // log
+                            error!(target: "stdout", "{}", &err_msg);
+
+                            return error::internal_server_error(err_msg);
+                        }
+                    },
                     _ => {
                         let err_msg = format!("Invalid field name: {}", &field.headers.name);
 
@@ -589,6 +689,12 @@ pub(crate) async fn whisper_translations_handler(req: Request<Body>) -> Response
                             }
                         }
                     }
+                    "detect_language" => unimplemented!(),
+                    "offset_time" => unimplemented!(),
+                    "duration" => unimplemented!(),
+                    "max_context" => unimplemented!(),
+                    "max_len" => unimplemented!(),
+                    "split_on_word" => unimplemented!(),
                     _ => {
                         let err_msg = format!("Invalid field name: {}", &field.headers.name);
 
