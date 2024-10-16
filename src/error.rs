@@ -54,6 +54,24 @@ pub(crate) fn invalid_endpoint(msg: impl AsRef<str>) -> Response<Body> {
         .unwrap()
 }
 
+pub(crate) fn bad_request(msg: impl AsRef<str>) -> Response<Body> {
+    let err_msg = match msg.as_ref().is_empty() {
+        true => "400 Bad Request".to_string(),
+        false => format!("400 Bad Request: {}", msg.as_ref()),
+    };
+
+    // log error
+    error!(target: "stdout", "{}", &err_msg);
+
+    Response::builder()
+        .header("Access-Control-Allow-Origin", "*")
+        .header("Access-Control-Allow-Methods", "*")
+        .header("Access-Control-Allow-Headers", "*")
+        .status(hyper::StatusCode::BAD_REQUEST)
+        .body(Body::from(err_msg))
+        .unwrap()
+}
+
 #[derive(Error, Clone, Debug, PartialEq, Eq)]
 pub enum ServerError {
     /// Generic error returned while performing an operation
