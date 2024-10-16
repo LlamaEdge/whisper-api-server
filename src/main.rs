@@ -5,7 +5,7 @@ mod backend;
 mod error;
 
 use anyhow::Result;
-use clap::{ArgGroup, Parser};
+use clap::{ArgGroup, Parser, ValueEnum};
 use error::ServerError;
 use hyper::{
     body::HttpBody,
@@ -13,6 +13,7 @@ use hyper::{
     service::{make_service_fn, service_fn},
     Body, Request, Response, Server,
 };
+use once_cell::sync::OnceCell;
 use serde::{Deserialize, Serialize};
 use std::{net::SocketAddr, path::PathBuf};
 use tokio::net::TcpListener;
@@ -21,6 +22,9 @@ type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
 
 // default port
 const DEFAULT_PORT: &str = "8080";
+
+// server info
+pub(crate) static TASK: OnceCell<TaskType> = OnceCell::new();
 
 #[derive(Debug, Parser)]
 #[command(name = "Whisper API Server", version = env!("CARGO_PKG_VERSION"), author = env!("CARGO_PKG_AUTHORS"), about = "Whisper API Server")]
@@ -35,12 +39,21 @@ struct Cli {
     /// Path to the whisper model file
     #[arg(short = 'm', long)]
     model: PathBuf,
-    /// Socket address of LlamaEdge API Server instance. For example, `0.0.0.0:8080`.
-    #[arg(long, default_value = None, value_parser = clap::value_parser!(SocketAddr), group = "socket_address_group")]
-    socket_addr: Option<SocketAddr>,
+    /// Number of threads to use during computation
+    #[arg(long, default_value = "4")]
+    threads: u64,
+    /// Number of processors to use during computation
+    #[arg(long, default_value = "1")]
+    processors: u32,
+    /// Task type.
+    #[arg(long, default_value = "full")]
+    task: TaskType,
     /// Port number
     #[arg(long, default_value = DEFAULT_PORT, value_parser = clap::value_parser!(u16), group = "socket_address_group")]
     port: u16,
+    /// Socket address of LlamaEdge API Server instance. For example, `0.0.0.0:8080`.
+    #[arg(long, default_value = None, value_parser = clap::value_parser!(SocketAddr), group = "socket_address_group")]
+    socket_addr: Option<SocketAddr>,
 }
 
 #[allow(clippy::needless_return)]
@@ -76,6 +89,18 @@ async fn main() -> Result<(), ServerError> {
 
     // log model path
     info!(target: "stdout", "model path: {}", cli.model.display());
+
+    // log the number of threads
+    info!(target: "stdout", "threads: {}", cli.threads);
+
+    // log the number of processors
+    info!(target: "stdout", "processors: {}", cli.processors);
+
+    // log the task type
+    info!(target: "stdout", "task: {}", cli.task);
+
+    TASK.set(cli.task)
+        .map_err(|_| ServerError::Operation("Failed to set `TASK`.".to_string()))?;
 
     // create a Metadata instance
     let metadata = llama_core::metadata::whisper::WhisperMetadataBuilder::new(
@@ -246,6 +271,29 @@ impl std::str::FromStr for LogLevel {
             "error" => Ok(LogLevel::Error),
             "critical" => Ok(LogLevel::Critical),
             _ => Err(format!("Invalid log level: {}", s)),
+        }
+    }
+}
+
+/// Task type.
+#[derive(Clone, Debug, Copy, PartialEq, Eq, ValueEnum)]
+enum TaskType {
+    /// `tracriptions` task.
+    #[value(name = "transcribe")]
+    Transcriptions,
+    /// `translations` task.
+    #[value(name = "translate")]
+    Translations,
+    /// `transcriptions` and `translations` tasks.
+    #[value(name = "full")]
+    Full,
+}
+impl std::fmt::Display for TaskType {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            TaskType::Transcriptions => write!(f, "transcriptions"),
+            TaskType::Translations => write!(f, "translations"),
+            TaskType::Full => write!(f, "transcriptions and translations"),
         }
     }
 }
