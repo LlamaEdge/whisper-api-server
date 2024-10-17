@@ -359,7 +359,7 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 [[package]]
 name = "chat-prompts"
 version = "0.17.1"
-source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=feat-improve-whisper#609d64aa010c9d50640f91b35800db01c24e0ebf"
+source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=feat-improve-whisper#9149b8f95d4fd147bb40d9c88ee46adfbfdd2767"
 dependencies = [
  "base64 0.22.1",
  "clap",
@@ -605,7 +605,7 @@ dependencies = [
 [[package]]
 name = "endpoints"
 version = "0.16.0"
-source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=feat-improve-whisper#609d64aa010c9d50640f91b35800db01c24e0ebf"
+source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=feat-improve-whisper#9149b8f95d4fd147bb40d9c88ee46adfbfdd2767"
 dependencies = [
  "indexmap",
  "serde",
@@ -1292,7 +1292,7 @@ checksum = "78b3ae25bc7c8c38cec158d1f2757ee79e9b3740fbc7ccf0e59e4b08d793fa89"
 [[package]]
 name = "llama-core"
 version = "0.20.0"
-source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=feat-improve-whisper#609d64aa010c9d50640f91b35800db01c24e0ebf"
+source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=feat-improve-whisper#9149b8f95d4fd147bb40d9c88ee46adfbfdd2767"
 dependencies = [
  "base64 0.22.1",
  "chat-prompts",
@@ -1826,9 +1826,9 @@ dependencies = [
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.87"
+version = "1.0.88"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b3e4daa0dcf6feba26f985457cdf104d4b4256fc5a09547140f3631bb076b19a"
+checksum = "7c3a7fc5db1e57d5a779a352c8cdb57b29aa4c40cc69c3a68a7fedc815fbf2f9"
 dependencies = [
  "unicode-ident",
 ]
