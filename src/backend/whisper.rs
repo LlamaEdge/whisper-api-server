@@ -267,9 +267,116 @@ pub(crate) async fn whisper_transcriptions_handler(req: Request<Body>) -> Respon
                         }
                     }
                     "timestamp_granularities" => unimplemented!(),
-                    "detect_language" => unimplemented!(),
-                    "offset_time" => unimplemented!(),
-                    "duration" => unimplemented!(),
+                    "detect_language" => match field.is_text() {
+                        true => {
+                            let mut detect_language: String = String::new();
+
+                            if let Err(e) = field.data.read_to_string(&mut detect_language) {
+                                let err_msg = format!("Failed to read `detect_language`. {}", e);
+
+                                // log
+                                error!(target: "stdout", "{}", &err_msg);
+
+                                return error::internal_server_error(err_msg);
+                            }
+
+                            match detect_language.parse::<bool>() {
+                                Ok(detect_language) => {
+                                    request.detect_language = Some(detect_language)
+                                }
+                                Err(e) => {
+                                    let err_msg =
+                                        format!("Failed to parse `detect_language`. Reason: {}", e);
+
+                                    // log
+                                    error!(target: "stdout", "{}", &err_msg);
+
+                                    return error::bad_request(err_msg);
+                                }
+                            }
+                        }
+                        false => {
+                            let err_msg =
+                                "Failed to get `detect_language`. The `detect_language` field in the request should be a text field.";
+
+                            // log
+                            error!(target: "stdout", "{}", &err_msg);
+
+                            return error::internal_server_error(err_msg);
+                        }
+                    },
+                    "offset_time" => match field.is_text() {
+                        true => {
+                            let mut offset_time: String = String::new();
+
+                            if let Err(e) = field.data.read_to_string(&mut offset_time) {
+                                let err_msg = format!("Failed to read `offset_time`. {}", e);
+
+                                // log
+                                error!(target: "stdout", "{}", &err_msg);
+
+                                return error::internal_server_error(err_msg);
+                            }
+
+                            match offset_time.parse::<u64>() {
+                                Ok(offset_time) => request.offset_time = Some(offset_time),
+                                Err(e) => {
+                                    let err_msg =
+                                        format!("Failed to parse `offset_time`. Reason: {}", e);
+
+                                    // log
+                                    error!(target: "stdout", "{}", &err_msg);
+
+                                    return error::bad_request(err_msg);
+                                }
+                            }
+                        }
+                        false => {
+                            let err_msg =
+                                "Failed to get `offset_time`. The `offset_time` field in the request should be a text field.";
+
+                            // log
+                            error!(target: "stdout", "{}", &err_msg);
+
+                            return error::internal_server_error(err_msg);
+                        }
+                    },
+                    "duration" => match field.is_text() {
+                        true => {
+                            let mut duration: String = String::new();
+
+                            if let Err(e) = field.data.read_to_string(&mut duration) {
+                                let err_msg = format!("Failed to read `duration`. {}", e);
+
+                                // log
+                                error!(target: "stdout", "{}", &err_msg);
+
+                                return error::internal_server_error(err_msg);
+                            }
+
+                            match duration.parse::<u64>() {
+                                Ok(duration) => request.duration = Some(duration),
+                                Err(e) => {
+                                    let err_msg =
+                                        format!("Failed to parse `duration`. Reason: {}", e);
+
+                                    // log
+                                    error!(target: "stdout", "{}", &err_msg);
+
+                                    return error::bad_request(err_msg);
+                                }
+                            }
+                        }
+                        false => {
+                            let err_msg =
+                                "Failed to get `duration`. The `duration` field in the request should be a text field.";
+
+                            // log
+                            error!(target: "stdout", "{}", &err_msg);
+
+                            return error::internal_server_error(err_msg);
+                        }
+                    },
                     "max_context" => unimplemented!(),
                     "max_len" => match field.is_text() {
                         true => {
@@ -284,7 +391,7 @@ pub(crate) async fn whisper_transcriptions_handler(req: Request<Body>) -> Respon
                                 return error::internal_server_error(err_msg);
                             }
 
-                            match max_len.parse::<u32>() {
+                            match max_len.parse::<u64>() {
                                 Ok(max_len) => request.max_len = Some(max_len),
                                 Err(e) => {
                                     let err_msg =
@@ -689,12 +796,189 @@ pub(crate) async fn whisper_translations_handler(req: Request<Body>) -> Response
                             }
                         }
                     }
-                    "detect_language" => unimplemented!(),
-                    "offset_time" => unimplemented!(),
-                    "duration" => unimplemented!(),
+                    "detect_language" => match field.is_text() {
+                        true => {
+                            let mut detect_language: String = String::new();
+
+                            if let Err(e) = field.data.read_to_string(&mut detect_language) {
+                                let err_msg = format!("Failed to read `detect_language`. {}", e);
+
+                                // log
+                                error!(target: "stdout", "{}", &err_msg);
+
+                                return error::internal_server_error(err_msg);
+                            }
+
+                            match detect_language.parse::<bool>() {
+                                Ok(detect_language) => {
+                                    request.detect_language = Some(detect_language)
+                                }
+                                Err(e) => {
+                                    let err_msg =
+                                        format!("Failed to parse `detect_language`. Reason: {}", e);
+
+                                    // log
+                                    error!(target: "stdout", "{}", &err_msg);
+
+                                    return error::bad_request(err_msg);
+                                }
+                            }
+                        }
+                        false => {
+                            let err_msg =
+                                "Failed to get `detect_language`. The `detect_language` field in the request should be a text field.";
+
+                            // log
+                            error!(target: "stdout", "{}", &err_msg);
+
+                            return error::internal_server_error(err_msg);
+                        }
+                    },
+                    "offset_time" => match field.is_text() {
+                        true => {
+                            let mut offset_time: String = String::new();
+
+                            if let Err(e) = field.data.read_to_string(&mut offset_time) {
+                                let err_msg = format!("Failed to read `offset_time`. {}", e);
+
+                                // log
+                                error!(target: "stdout", "{}", &err_msg);
+
+                                return error::internal_server_error(err_msg);
+                            }
+
+                            match offset_time.parse::<u64>() {
+                                Ok(offset_time) => request.offset_time = Some(offset_time),
+                                Err(e) => {
+                                    let err_msg =
+                                        format!("Failed to parse `offset_time`. Reason: {}", e);
+
+                                    // log
+                                    error!(target: "stdout", "{}", &err_msg);
+
+                                    return error::bad_request(err_msg);
+                                }
+                            }
+                        }
+                        false => {
+                            let err_msg =
+                                "Failed to get `offset_time`. The `offset_time` field in the request should be a text field.";
+
+                            // log
+                            error!(target: "stdout", "{}", &err_msg);
+
+                            return error::internal_server_error(err_msg);
+                        }
+                    },
+                    "duration" => match field.is_text() {
+                        true => {
+                            let mut duration: String = String::new();
+
+                            if let Err(e) = field.data.read_to_string(&mut duration) {
+                                let err_msg = format!("Failed to read `duration`. {}", e);
+
+                                // log
+                                error!(target: "stdout", "{}", &err_msg);
+
+                                return error::internal_server_error(err_msg);
+                            }
+
+                            match duration.parse::<u64>() {
+                                Ok(duration) => request.duration = Some(duration),
+                                Err(e) => {
+                                    let err_msg =
+                                        format!("Failed to parse `duration`. Reason: {}", e);
+
+                                    // log
+                                    error!(target: "stdout", "{}", &err_msg);
+
+                                    return error::bad_request(err_msg);
+                                }
+                            }
+                        }
+                        false => {
+                            let err_msg =
+                                "Failed to get `duration`. The `duration` field in the request should be a text field.";
+
+                            // log
+                            error!(target: "stdout", "{}", &err_msg);
+
+                            return error::internal_server_error(err_msg);
+                        }
+                    },
                     "max_context" => unimplemented!(),
-                    "max_len" => unimplemented!(),
-                    "split_on_word" => unimplemented!(),
+                    "max_len" => match field.is_text() {
+                        true => {
+                            let mut max_len: String = String::new();
+
+                            if let Err(e) = field.data.read_to_string(&mut max_len) {
+                                let err_msg = format!("Failed to read `max_len`. {}", e);
+
+                                // log
+                                error!(target: "stdout", "{}", &err_msg);
+
+                                return error::internal_server_error(err_msg);
+                            }
+
+                            match max_len.parse::<u64>() {
+                                Ok(max_len) => request.max_len = Some(max_len),
+                                Err(e) => {
+                                    let err_msg =
+                                        format!("Failed to parse `max_len`. Reason: {}", e);
+
+                                    // log
+                                    error!(target: "stdout", "{}", &err_msg);
+
+                                    return error::bad_request(err_msg);
+                                }
+                            }
+                        }
+                        false => {
+                            let err_msg =
+                                "Failed to get `max_len`. The `max_len` field in the request should be a text field.";
+
+                            // log
+                            error!(target: "stdout", "{}", &err_msg);
+
+                            return error::internal_server_error(err_msg);
+                        }
+                    },
+                    "split_on_word" => match field.is_text() {
+                        true => {
+                            let mut split_on_word: String = String::new();
+
+                            if let Err(e) = field.data.read_to_string(&mut split_on_word) {
+                                let err_msg = format!("Failed to read `split_on_word`. {}", e);
+
+                                // log
+                                error!(target: "stdout", "{}", &err_msg);
+
+                                return error::internal_server_error(err_msg);
+                            }
+
+                            match split_on_word.parse::<bool>() {
+                                Ok(split_on_word) => request.split_on_word = Some(split_on_word),
+                                Err(e) => {
+                                    let err_msg =
+                                        format!("Failed to parse `split_on_word`. Reason: {}", e);
+
+                                    // log
+                                    error!(target: "stdout", "{}", &err_msg);
+
+                                    return error::bad_request(err_msg);
+                                }
+                            }
+                        }
+                        false => {
+                            let err_msg =
+                                "Failed to get `split_on_word`. The `split_on_word` field in the request should be a text field.";
+
+                            // log
+                            error!(target: "stdout", "{}", &err_msg);
+
+                            return error::internal_server_error(err_msg);
+                        }
+                    },
                     _ => {
                         let err_msg = format!("Invalid field name: {}", &field.headers.name);
 
