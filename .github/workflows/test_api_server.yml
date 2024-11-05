@@ -144,7 +144,7 @@ jobs:
         run: |
           curl -LO https://github.com/WasmEdge/WasmEdge/releases/download/${{ matrix.wasmedge_version }}/WasmEdge-plugin-wasi_nn-whisper-${{ matrix.wasmedge_version }}-darwin_x86_64.tar.gz
           tar -xzvf WasmEdge-plugin-wasi_nn-whisper-${{ matrix.wasmedge_version }}-darwin_x86_64.tar.gz
-          mv libwasmedgePluginWasiNN.so $HOME/.wasmedge/plugin/
+          mv libwasmedgePluginWasiNN.dylib $HOME/.wasmedge/plugin/
           ls -al
           ls -al $HOME/.wasmedge/plugin/
 
