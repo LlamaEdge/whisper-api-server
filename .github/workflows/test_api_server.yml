@@ -224,8 +224,8 @@ jobs:
 
       - name: Deploy whisper plugin
         run: |
-          curl -LO https://github.com/WasmEdge/WasmEdge/releases/download/${{ matrix.wasmedge_version }}/WasmEdge-plugin-wasi_nn-whisper-${{ matrix.wasmedge_version }}-darwin_x86_64.tar.gz
-          tar -xzvf WasmEdge-plugin-wasi_nn-whisper-${{ matrix.wasmedge_version }}-darwin_x86_64.tar.gz
+          curl -LO https://github.com/WasmEdge/WasmEdge/releases/download/${{ matrix.wasmedge_version }}/WasmEdge-plugin-wasi_nn-whisper-${{ matrix.wasmedge_version }}-darwin_arm64.tar.gz
+          tar -xzvf WasmEdge-plugin-wasi_nn-whisper-${{ matrix.wasmedge_version }}-darwin_arm64.tar.gz
           mv libwasmedgePluginWasiNN.dylib $HOME/.wasmedge/plugin/
           ls -al
           ls -al $HOME/.wasmedge/plugin/
@@ -306,8 +306,8 @@ jobs:
 
       - name: Deploy whisper plugin
         run: |
-          curl -LO https://github.com/WasmEdge/WasmEdge/releases/download/${{ matrix.wasmedge_version }}/WasmEdge-plugin-wasi_nn-whisper-${{ matrix.wasmedge_version }}-darwin_x86_64.tar.gz
-          tar -xzvf WasmEdge-plugin-wasi_nn-whisper-${{ matrix.wasmedge_version }}-darwin_x86_64.tar.gz
+          curl -LO https://github.com/WasmEdge/WasmEdge/releases/download/${{ matrix.wasmedge_version }}/WasmEdge-plugin-wasi_nn-whisper-${{ matrix.wasmedge_version }}-darwin_arm64.tar.gz
+          tar -xzvf WasmEdge-plugin-wasi_nn-whisper-${{ matrix.wasmedge_version }}-darwin_arm64.tar.gz
           mv libwasmedgePluginWasiNN.dylib $HOME/.wasmedge/plugin/
           ls -al
           ls -al $HOME/.wasmedge/plugin/
