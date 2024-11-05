@@ -32,7 +32,7 @@ on:
       - 'tests/*.hurl'
 
 jobs:
-  test-api-server:
+  test-api-server-ubuntu:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -74,6 +74,89 @@ jobs:
 
       - name: Build whisper-api-server on linux
         env:
+          RUSTFLAGS: "--cfg wasmedge --cfg tokio_unstable"
+        run: |
+          cargo build --release
+          cp target/wasm32-wasip1/release/whisper-api-server.wasm ./whisper-api-server.wasm
+
+      - name: Download model and audio files
+        run: |
+          curl -LO https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-medium.bin
+          ls -al
+          cp ./data/*.wav ./tests/
+          ls -al ./tests
+
+      - name: Start whisper-api-server
+        run: |
+          nohup $HOME/.wasmedge/bin/wasmedge --dir .:. whisper-api-server.wasm -m ggml-medium.bin > ./start-llamaedge.log 2>&1 &
+          sleep 5
+          cat start-llamaedge.log
+
+      - name: Test translations endpoint
+        run: |
+          ls -al ./tests
+          hurl --test --jobs 1 ./tests/translations.hurl
+
+      - name: Test transcriptions endpoint
+        run: |
+          ls -al ./tests
+          hurl --test --jobs 1 ./tests/transcriptions.hurl
+
+      - name: Stop llama-api-server
+        run: |
+          pkill -f wasmedge
+
+  test-api-server-macos-13:
+    runs-on: macos-13
+    needs: test-api-server-ubuntu
+    strategy:
+      matrix:
+        wasmedge_version: [0.14.1]
+    steps:
+      - name: Clone project
+        id: checkout
+        uses: actions/checkout@v3
+
+      - name: Install Rust-nightly
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: nightly
+          target: wasm32-wasip1
+          components: rustfmt, clippy
+
+      - name: Install Rust-stable
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          target: wasm32-wasip1
+
+      - name: Download wasi-sdk for x86_64-macos
+        run: |
+          curl -LO https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-24/wasi-sdk-24.0-x86_64-macos.tar.gz
+          tar -xzvf wasi-sdk-24.0-x86_64-macos.tar.gz
+          mv wasi-sdk-24.0-x86_64-macos wasi-sdk-24.0
+
+      - name: Install WasmEdge
+        run: |
+          curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install_v2.sh | bash -s -- -v ${{ matrix.wasmedge_version }}
+          ls -al $HOME/.wasmedge/bin
+
+      - name: Deploy whisper plugin
+        run: |
+          curl -LO https://github.com/WasmEdge/WasmEdge/releases/download/${{ matrix.wasmedge_version }}/WasmEdge-plugin-wasi_nn-whisper-${{ matrix.wasmedge_version }}-darwin_x86_64.tar.gz
+          tar -xzvf WasmEdge-plugin-wasi_nn-whisper-${{ matrix.wasmedge_version }}-darwin_x86_64.tar.gz
+          mv libwasmedgePluginWasiNN.so $HOME/.wasmedge/plugin/
+          ls -al
+          ls -al $HOME/.wasmedge/plugin/
+
+      - name: Install Hurl
+        run: |
+          curl --location --remote-name https://github.com/Orange-OpenSource/hurl/releases/download/5.0.1/hurl_5.0.1_amd64.deb
+          sudo apt update && sudo apt install ./hurl_5.0.1_amd64.deb
+
+      - name: Build whisper-api-server on macos-13
+        env:
+          WASI_SDK_PATH: /Users/runner/work/whisper-api-server/whisper-api-server/wasi-sdk-24.0
+          CC: "/Users/runner/work/whisper-api-server/whisper-api-server/wasi-sdk-24.0/bin/clang --sysroot=/Users/runner/work/whisper-api-server/whisper-api-server/wasi-sdk-24.0/share/wasi-sysroot"
           RUSTFLAGS: "--cfg wasmedge --cfg tokio_unstable"
         run: |
           cargo build --release
