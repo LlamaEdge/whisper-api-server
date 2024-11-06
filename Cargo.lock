@@ -610,9 +610,9 @@ dependencies = [
 
 [[package]]
 name = "endpoints"
-version = "0.17.0"
+version = "0.17.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "372714de184d1d586da8e227d80b5e44f58e7f8a5f0b62a52155084e9439fc3f"
+checksum = "60b69284db9be5e360da84f032195312a2b179f86e108181498bf94845822ccd"
 dependencies = [
  "indexmap",
  "serde",
@@ -1423,9 +1423,9 @@ checksum = "643cb0b8d4fcc284004d5fd0d67ccf61dfffadb7f75e1e71bc420f4688a3a704"
 
 [[package]]
 name = "llama-core"
-version = "0.21.1"
+version = "0.21.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "add84ecb61537b4f57c9d5d9c8543db3a85ca2c8e8fca5a3524cf43f02342502"
+checksum = "96873be451b46450f0783c36fadb8f3ed49b84e2a29228f66685ec6077d02c73"
 dependencies = [
  "base64 0.22.1",
  "chat-prompts",
