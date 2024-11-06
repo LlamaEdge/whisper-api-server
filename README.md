@@ -151,8 +151,11 @@ Options:
   -n, --model-name <MODEL_NAME>    Model name [default: default]
   -a, --model-alias <MODEL_ALIAS>  Model alias [default: default]
   -m, --model <MODEL>              Path to the whisper model file
-      --socket-addr <SOCKET_ADDR>  Socket address of LlamaEdge API Server instance. For example, `0.0.0.0:8080`
+      --threads <THREADS>          Number of threads to use during computation [default: 4]
+      --processors <PROCESSORS>    Number of processors to use during computation [default: 1]
+      --task <TASK>                Task type [default: full] [possible values: transcribe, translate, full]
       --port <PORT>                Port number [default: 8080]
-  -h, --help                       Print help
+      --socket-addr <SOCKET_ADDR>  Socket address of LlamaEdge API Server instance. For example, `0.0.0.0:8080`
+  -h, --help                       Print help (see more with '--help')
   -V, --version                    Print version
 ```
