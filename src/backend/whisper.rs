@@ -1,7 +1,7 @@
 use crate::error;
 use endpoints::{
     audio::{transcription::TranscriptionRequest, translation::TranslationRequest},
-    files::FileObject,
+    files::{DeleteFileStatus, FileObject},
 };
 use hyper::{body::to_bytes, Body, Method, Request, Response};
 use multipart::server::{Multipart, ReadEntry, ReadEntryResult};
@@ -1050,4 +1050,163 @@ pub(crate) async fn whisper_translations_handler(req: Request<Body>) -> Response
     info!(target: "stdout", "Send the audio translation response");
 
     res
+}
+
+/// List all files, or remove a file by id.
+///
+/// - `GET /v1/files`: List all files.
+/// - `DELETE /v1/files/{file_id}`: Delete a file by id.
+///
+pub(crate) async fn files_handler(req: Request<Body>) -> Response<Body> {
+    // log
+    info!(target: "stdout", "Handling the coming files request");
+
+    let res = if req.method() == Method::GET {
+        let uri_path = req.uri().path().trim_end_matches('/').to_lowercase();
+
+        // Split the path into segments
+        let segments: Vec<&str> = uri_path.split('/').collect();
+
+        match segments.as_slice() {
+            ["", "v1", "files"] => list_files(),
+            _ => {
+                let err_msg = format!("unsupported uri path: {}", uri_path);
+
+                // log
+                error!(target: "stdout", "{}", &err_msg);
+
+                error::internal_server_error(err_msg)
+            }
+        }
+    } else if req.method() == Method::DELETE {
+        let id = req.uri().path().trim_start_matches("/v1/files/");
+        let status = match llama_core::files::remove_file(id) {
+            Ok(status) => status,
+            Err(e) => {
+                let err_msg = format!("Failed to delete the target file with id {}. {}", id, e);
+
+                // log
+                error!(target: "stdout", "{}", &err_msg);
+
+                DeleteFileStatus {
+                    id: id.into(),
+                    object: "file".to_string(),
+                    deleted: false,
+                }
+            }
+        };
+
+        // serialize status
+        let s = match serde_json::to_string(&status) {
+            Ok(s) => s,
+            Err(e) => {
+                let err_msg = format!(
+                    "Failed to serialize the status of the file deletion operation. {}",
+                    e
+                );
+
+                // log
+                error!(target: "stdout", "{}", &err_msg);
+
+                return error::internal_server_error(err_msg);
+            }
+        };
+
+        // return response
+        let result = Response::builder()
+            .header("Access-Control-Allow-Origin", "*")
+            .header("Access-Control-Allow-Methods", "*")
+            .header("Access-Control-Allow-Headers", "*")
+            .header("Content-Type", "application/json")
+            .body(Body::from(s));
+
+        match result {
+            Ok(response) => response,
+            Err(e) => {
+                let err_msg = e.to_string();
+
+                // log
+                error!(target: "stdout", "{}", &err_msg);
+
+                error::internal_server_error(err_msg)
+            }
+        }
+    } else if req.method() == Method::OPTIONS {
+        let result = Response::builder()
+            .header("Access-Control-Allow-Origin", "*")
+            .header("Access-Control-Allow-Methods", "*")
+            .header("Access-Control-Allow-Headers", "*")
+            .header("Content-Type", "application/json")
+            .body(Body::empty());
+
+        match result {
+            Ok(response) => return response,
+            Err(e) => {
+                let err_msg = e.to_string();
+
+                // log
+                error!(target: "files_handler", "{}", &err_msg);
+
+                return error::internal_server_error(err_msg);
+            }
+        }
+    } else {
+        let err_msg = "Invalid HTTP Method.";
+
+        // log
+        error!(target: "stdout", "{}", &err_msg);
+
+        error::internal_server_error(err_msg)
+    };
+
+    info!(target: "stdout", "Send the files response");
+
+    res
+}
+
+fn list_files() -> Response<Body> {
+    match llama_core::files::list_files() {
+        Ok(file_objects) => {
+            // serialize chat completion object
+            let s = match serde_json::to_string(&file_objects) {
+                Ok(s) => s,
+                Err(e) => {
+                    let err_msg = format!("Failed to serialize file list. {}", e);
+
+                    // log
+                    error!(target: "stdout", "{}", &err_msg);
+
+                    return error::internal_server_error(err_msg);
+                }
+            };
+
+            // return response
+            let result = Response::builder()
+                .header("Access-Control-Allow-Origin", "*")
+                .header("Access-Control-Allow-Methods", "*")
+                .header("Access-Control-Allow-Headers", "*")
+                .header("Content-Type", "application/json")
+                .body(Body::from(s));
+
+            match result {
+                Ok(response) => response,
+                Err(e) => {
+                    let err_msg = e.to_string();
+
+                    // log
+                    error!(target: "stdout", "{}", &err_msg);
+
+                    error::internal_server_error(err_msg)
+                }
+            }
+        }
+        Err(e) => {
+            let err_msg = format!("Failed to list all files. {}", e);
+
+            // log
+            error!(target: "stdout", "{}", &err_msg);
+
+            error::internal_server_error(err_msg)
+        }
+    }
 }

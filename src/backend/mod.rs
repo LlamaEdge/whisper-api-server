@@ -41,6 +41,13 @@ pub(crate) async fn handle_llama_request(req: Request<Body>) -> Response<Body> {
                 error::internal_server_error(err_msg)
             }
         },
-        _ => error::invalid_endpoint(req.uri().path()),
+        "/v1/files" => whisper::files_handler(req).await,
+        path => {
+            if path.starts_with("/v1/files/") {
+                whisper::files_handler(req).await
+            } else {
+                error::invalid_endpoint(path)
+            }
+        }
     }
 }
