@@ -59,7 +59,7 @@ pub(crate) async fn whisper_transcriptions_handler(req: Request<Body>) -> Respon
             while let ReadEntryResult::Entry(mut field) = multipart.read_entry_mut() {
                 match &*field.headers.name {
                     "file" => {
-                        let filename = match field.headers.filename {
+                        let mut filename = match field.headers.filename {
                             Some(filename) => filename,
                             None => {
                                 let err_msg =
@@ -71,15 +71,6 @@ pub(crate) async fn whisper_transcriptions_handler(req: Request<Body>) -> Respon
                                 return error::internal_server_error(err_msg);
                             }
                         };
-
-                        if !(filename).to_lowercase().ends_with(".wav") {
-                            let err_msg = "The audio file (*.wav) must be have a sample rate of 16k and be single-channel.";
-
-                            // log
-                            error!(target: "stdout", "{}", &err_msg);
-
-                            return error::internal_server_error(err_msg);
-                        }
 
                         let mut buffer = Vec::new();
                         let size_in_bytes = match field.data.read_to_end(&mut buffer) {
@@ -96,6 +87,25 @@ pub(crate) async fn whisper_transcriptions_handler(req: Request<Body>) -> Respon
 
                         // create a unique file id
                         let id = format!("file_{}", uuid::Uuid::new_v4());
+
+                        // TODO: the code snippet below needs a further improvement
+                        // save the file
+                        let path = Path::new("archives");
+                        if !path.exists() {
+                            fs::create_dir(path).unwrap();
+                        }
+                        let file_path = path.join(&id);
+                        if !file_path.exists() {
+                            fs::create_dir(&file_path).unwrap();
+                        }
+                        let output_file = file_path.join(&filename);
+                        let output_wav_file = output_file.with_extension("wav");
+                        filename = output_wav_file
+                            .file_name()
+                            .unwrap()
+                            .to_str()
+                            .unwrap()
+                            .to_string();
 
                         // log
                         info!(target: "stdout", "file_id: {}, file_name: {}", &id, &filename);
@@ -124,6 +134,18 @@ pub(crate) async fn whisper_transcriptions_handler(req: Request<Body>) -> Respon
                             }
                         };
                         file.write_all(&buffer[..]).unwrap();
+
+                        // TODO: the code snippet below needs a further improvement
+                        let converter = wavup::AudioConverter::new(
+                            "",
+                            output_wav_file.to_str().unwrap(),
+                            16000,
+                        );
+                        if let Err(e) = converter.convert_audio_from_bytes(&buffer) {
+                            let err_msg = format!("Failed to convert audio. {}", e);
+                            error!(target: "stdout", "{}", &err_msg);
+                            return error::internal_server_error(err_msg);
+                        }
 
                         let created_at =
                             match SystemTime::now().duration_since(std::time::UNIX_EPOCH) {
@@ -569,7 +591,7 @@ pub(crate) async fn whisper_translations_handler(req: Request<Body>) -> Response
             while let ReadEntryResult::Entry(mut field) = multipart.read_entry_mut() {
                 match &*field.headers.name {
                     "file" => {
-                        let filename = match field.headers.filename {
+                        let mut filename = match field.headers.filename {
                             Some(filename) => filename,
                             None => {
                                 let err_msg =
@@ -581,15 +603,6 @@ pub(crate) async fn whisper_translations_handler(req: Request<Body>) -> Response
                                 return error::internal_server_error(err_msg);
                             }
                         };
-
-                        if !(filename).to_lowercase().ends_with(".wav") {
-                            let err_msg = "The audio file (*.wav) must be have a sample rate of 16k and be single-channel.";
-
-                            // log
-                            error!(target: "stdout", "{}", &err_msg);
-
-                            return error::internal_server_error(err_msg);
-                        }
 
                         let mut buffer = Vec::new();
                         let size_in_bytes = match field.data.read_to_end(&mut buffer) {
@@ -607,9 +620,7 @@ pub(crate) async fn whisper_translations_handler(req: Request<Body>) -> Response
                         // create a unique file id
                         let id = format!("file_{}", uuid::Uuid::new_v4());
 
-                        // log
-                        info!(target: "stdout", "file_id: {}, file_name: {}", &id, &filename);
-
+                        // TODO: the code snippet below needs a further improvement
                         // save the file
                         let path = Path::new("archives");
                         if !path.exists() {
@@ -619,21 +630,29 @@ pub(crate) async fn whisper_translations_handler(req: Request<Body>) -> Response
                         if !file_path.exists() {
                             fs::create_dir(&file_path).unwrap();
                         }
-                        let mut file = match File::create(file_path.join(&filename)) {
-                            Ok(file) => file,
-                            Err(e) => {
-                                let err_msg = format!(
-                                    "Failed to create archive document {}. {}",
-                                    &filename, e
-                                );
+                        let output_file = file_path.join(&filename);
+                        let output_wav_file = output_file.with_extension("wav");
+                        filename = output_wav_file
+                            .file_name()
+                            .unwrap()
+                            .to_str()
+                            .unwrap()
+                            .to_string();
 
-                                // log
-                                error!(target: "stdout", "{}", &err_msg);
+                        // log
+                        info!(target: "stdout", "file_id: {}, file_name: {}", &id, &filename);
 
-                                return error::internal_server_error(err_msg);
-                            }
-                        };
-                        file.write_all(&buffer[..]).unwrap();
+                        // TODO: the code snippet below needs a further improvement
+                        let converter = wavup::AudioConverter::new(
+                            "",
+                            output_wav_file.to_str().unwrap(),
+                            16000,
+                        );
+                        if let Err(e) = converter.convert_audio_from_bytes(&buffer) {
+                            let err_msg = format!("Failed to convert audio. {}", e);
+                            error!(target: "stdout", "{}", &err_msg);
+                            return error::internal_server_error(err_msg);
+                        }
 
                         let created_at =
                             match SystemTime::now().duration_since(std::time::UNIX_EPOCH) {
