@@ -7,8 +7,8 @@ use hyper::{body::to_bytes, Body, Method, Request, Response};
 use multipart::server::{Multipart, ReadEntry, ReadEntryResult};
 use multipart_2021 as multipart;
 use std::{
-    fs::{self, File},
-    io::{Cursor, Read, Write},
+    fs,
+    io::{Cursor, Read},
     path::Path,
     time::SystemTime,
 };
@@ -88,8 +88,7 @@ pub(crate) async fn whisper_transcriptions_handler(req: Request<Body>) -> Respon
                         // create a unique file id
                         let id = format!("file_{}", uuid::Uuid::new_v4());
 
-                        // TODO: the code snippet below needs a further improvement
-                        // save the file
+                        // create wav audio file to store the converted audio data
                         let path = Path::new("archives");
                         if !path.exists() {
                             fs::create_dir(path).unwrap();
@@ -110,37 +109,14 @@ pub(crate) async fn whisper_transcriptions_handler(req: Request<Body>) -> Respon
                         // log
                         info!(target: "stdout", "file_id: {}, file_name: {}", &id, &filename);
 
-                        // save the file
-                        let path = Path::new("archives");
-                        if !path.exists() {
-                            fs::create_dir(path).unwrap();
-                        }
-                        let file_path = path.join(&id);
-                        if !file_path.exists() {
-                            fs::create_dir(&file_path).unwrap();
-                        }
-                        let mut file = match File::create(file_path.join(&filename)) {
-                            Ok(file) => file,
-                            Err(e) => {
-                                let err_msg = format!(
-                                    "Failed to create archive document {}. {}",
-                                    &filename, e
-                                );
+                        // create a audio converter
+                        let converter = wavup::AudioConverterBuilder::new(
+                            output_wav_file.to_string_lossy(),
+                            llama_core::metadata::whisper::WHISPER_SAMPLE_RATE as u32,
+                        )
+                        .build();
 
-                                // log
-                                error!(target: "stdout", "{}", &err_msg);
-
-                                return error::internal_server_error(err_msg);
-                            }
-                        };
-                        file.write_all(&buffer[..]).unwrap();
-
-                        // TODO: the code snippet below needs a further improvement
-                        let converter = wavup::AudioConverter::new(
-                            "",
-                            output_wav_file.to_str().unwrap(),
-                            16000,
-                        );
+                        // convert to a wav audio file with the given sample rate
                         if let Err(e) = converter.convert_audio_from_bytes(&buffer) {
                             let err_msg = format!("Failed to convert audio. {}", e);
                             error!(target: "stdout", "{}", &err_msg);
@@ -620,8 +596,7 @@ pub(crate) async fn whisper_translations_handler(req: Request<Body>) -> Response
                         // create a unique file id
                         let id = format!("file_{}", uuid::Uuid::new_v4());
 
-                        // TODO: the code snippet below needs a further improvement
-                        // save the file
+                        // create wav audio file to store the converted audio data
                         let path = Path::new("archives");
                         if !path.exists() {
                             fs::create_dir(path).unwrap();
@@ -642,12 +617,14 @@ pub(crate) async fn whisper_translations_handler(req: Request<Body>) -> Response
                         // log
                         info!(target: "stdout", "file_id: {}, file_name: {}", &id, &filename);
 
-                        // TODO: the code snippet below needs a further improvement
-                        let converter = wavup::AudioConverter::new(
-                            "",
-                            output_wav_file.to_str().unwrap(),
-                            16000,
-                        );
+                        // create a audio converter
+                        let converter = wavup::AudioConverterBuilder::new(
+                            output_wav_file.to_string_lossy(),
+                            llama_core::metadata::whisper::WHISPER_SAMPLE_RATE as u32,
+                        )
+                        .build();
+
+                        // convert to a wav audio file with the given sample rate
                         if let Err(e) = converter.convert_audio_from_bytes(&buffer) {
                             let err_msg = format!("Failed to convert audio. {}", e);
                             error!(target: "stdout", "{}", &err_msg);
