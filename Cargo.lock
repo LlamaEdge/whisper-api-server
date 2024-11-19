@@ -3786,7 +3786,7 @@ dependencies = [
 [[package]]
 name = "wavup"
 version = "0.1.0"
-source = "git+https://github.com/LlamaEdge/WavUp.git?branch=feat-trim-silence#12dd8bec8e535f620ce7a3777473c69df04bf29e"
+source = "git+https://github.com/LlamaEdge/WavUp.git?branch=main#6325744bca0fe44480d4af4165919af811f450a6"
 dependencies = [
  "clap",
  "hound",
