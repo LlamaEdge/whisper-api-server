@@ -2,6 +2,12 @@
 
 This project is a RESTful API server that provides endpoints for transcribing and translating audio files. The APIs are compitable with OpenAI APIs of [transcriptions and translations](https://platform.openai.com/docs/api-reference/audio).
 
+The following is the list of supported audio formats and codecs:
+
+- The formats supported are `caf`, `isomp4`, `mkv`, `ogg`, `aiff`, `wav`.
+
+- The codecs supported are `aac`, `adpcm`, `alac`, `flac`, `mp1`, `mp2`, `mp3`, `pcm`, `vorbis`.
+
 > [!NOTE]
 > The project is still under active development. The existing features still need to be improved and more features will be added in the future.
 
