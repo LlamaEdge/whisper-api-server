@@ -81,14 +81,14 @@ jobs:
 
       - name: Download model and audio files
         run: |
-          curl -LO https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-medium.bin
+          curl -LO https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v2-q5_0.bin
           ls -al
           cp ./data/*.wav ./tests/
           ls -al ./tests
 
       - name: Start whisper-api-server
         run: |
-          nohup $HOME/.wasmedge/bin/wasmedge --dir .:. whisper-api-server.wasm -m ggml-medium.bin > ./start-llamaedge.log 2>&1 &
+          nohup $HOME/.wasmedge/bin/wasmedge --dir .:. whisper-api-server.wasm -m ggml-large-v2-q5_0.bin > ./start-llamaedge.log 2>&1 &
           sleep 5
           cat start-llamaedge.log
 
@@ -163,14 +163,14 @@ jobs:
 
       - name: Download model and audio files
         run: |
-          curl -LO https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-medium.bin
+          curl -LO https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v2-q5_0.bin
           ls -al
           cp ./data/*.wav ./tests/
           ls -al ./tests
 
       - name: Start whisper-api-server
         run: |
-          nohup $HOME/.wasmedge/bin/wasmedge --dir .:. whisper-api-server.wasm -m ggml-medium.bin > ./start-llamaedge.log 2>&1 &
+          nohup $HOME/.wasmedge/bin/wasmedge --dir .:. whisper-api-server.wasm -m ggml-large-v2-q5_0.bin > ./start-llamaedge.log 2>&1 &
           sleep 30
           cat start-llamaedge.log
 
@@ -245,14 +245,14 @@ jobs:
 
       - name: Download model and audio files
         run: |
-          curl -LO https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-medium.bin
+          curl -LO https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v2-q5_0.bin
           ls -al
           cp ./data/*.wav ./tests/
           ls -al ./tests
 
       - name: Start whisper-api-server
         run: |
-          nohup $HOME/.wasmedge/bin/wasmedge --dir .:. whisper-api-server.wasm -m ggml-medium.bin > ./start-llamaedge.log 2>&1 &
+          nohup $HOME/.wasmedge/bin/wasmedge --dir .:. whisper-api-server.wasm -m ggml-large-v2-q5_0.bin > ./start-llamaedge.log 2>&1 &
           sleep 30
           cat start-llamaedge.log
 
@@ -327,14 +327,14 @@ jobs:
 
       - name: Download model and audio files
         run: |
-          curl -LO https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-medium.bin
+          curl -LO https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v2-q5_0.bin
           ls -al
           cp ./data/*.wav ./tests/
           ls -al ./tests
 
       - name: Start whisper-api-server
         run: |
-          nohup $HOME/.wasmedge/bin/wasmedge --dir .:. whisper-api-server.wasm -m ggml-medium.bin > ./start-llamaedge.log 2>&1 &
+          nohup $HOME/.wasmedge/bin/wasmedge --dir .:. whisper-api-server.wasm -m ggml-large-v2-q5_0.bin > ./start-llamaedge.log 2>&1 &
           sleep 30
           cat start-llamaedge.log
 
