@@ -375,7 +375,42 @@ pub(crate) async fn whisper_transcriptions_handler(req: Request<Body>) -> Respon
                             return error::internal_server_error(err_msg);
                         }
                     },
-                    "max_context" => unimplemented!(),
+                    "max_context" => match field.is_text() {
+                        true => {
+                            let mut max_context: String = String::new();
+
+                            if let Err(e) = field.data.read_to_string(&mut max_context) {
+                                let err_msg = format!("Failed to read `max_context`. {}", e);
+
+                                // log
+                                error!(target: "stdout", "{}", &err_msg);
+
+                                return error::internal_server_error(err_msg);
+                            }
+
+                            match max_context.parse::<i32>() {
+                                Ok(max_context) => request.max_context = Some(max_context),
+                                Err(e) => {
+                                    let err_msg =
+                                        format!("Failed to parse `max_context`. Reason: {}", e);
+
+                                    // log
+                                    error!(target: "stdout", "{}", &err_msg);
+
+                                    return error::bad_request(err_msg);
+                                }
+                            }
+                        }
+                        false => {
+                            let err_msg =
+                                "Failed to get `max_context`. The `max_context` field in the request should be a text field.";
+
+                            // log
+                            error!(target: "stdout", "{}", &err_msg);
+
+                            return error::internal_server_error(err_msg);
+                        }
+                    },
                     "max_len" => match field.is_text() {
                         true => {
                             let mut max_len: String = String::new();
@@ -902,7 +937,42 @@ pub(crate) async fn whisper_translations_handler(req: Request<Body>) -> Response
                             return error::internal_server_error(err_msg);
                         }
                     },
-                    "max_context" => unimplemented!(),
+                    "max_context" => match field.is_text() {
+                        true => {
+                            let mut max_context: String = String::new();
+
+                            if let Err(e) = field.data.read_to_string(&mut max_context) {
+                                let err_msg = format!("Failed to read `max_context`. {}", e);
+
+                                // log
+                                error!(target: "stdout", "{}", &err_msg);
+
+                                return error::internal_server_error(err_msg);
+                            }
+
+                            match max_context.parse::<i32>() {
+                                Ok(max_context) => request.max_context = Some(max_context),
+                                Err(e) => {
+                                    let err_msg =
+                                        format!("Failed to parse `max_context`. Reason: {}", e);
+
+                                    // log
+                                    error!(target: "stdout", "{}", &err_msg);
+
+                                    return error::bad_request(err_msg);
+                                }
+                            }
+                        }
+                        false => {
+                            let err_msg =
+                                "Failed to get `max_context`. The `max_context` field in the request should be a text field.";
+
+                            // log
+                            error!(target: "stdout", "{}", &err_msg);
+
+                            return error::internal_server_error(err_msg);
+                        }
+                    },
                     "max_len" => match field.is_text() {
                         true => {
                             let mut max_len: String = String::new();
