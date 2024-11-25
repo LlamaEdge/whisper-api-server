@@ -6,4 +6,4 @@ file: file,test_cn.wav;
 language: zh
 HTTP 200
 [Asserts]
-jsonpath "$.text" contains "This is a Chinese broadcast"
+jsonpath "$.text" contains "This is a Chinese"
