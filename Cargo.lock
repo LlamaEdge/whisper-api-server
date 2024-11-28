@@ -319,9 +319,9 @@ checksum = "8f1fe948ff07f4bd06c30984e69f5b4899c516a3ef74f34df92a2df2ab535495"
 
 [[package]]
 name = "bytes"
-version = "1.8.0"
+version = "1.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9ac0150caa2ae65ca5bd83f25c7de183dea78d4d366469f148435e2acfbad0da"
+checksum = "325918d6fe32f23b19878fe4b34794ae41fc19ddbe53b10571a4874d44ffd39b"
 
 [[package]]
 name = "cc"
@@ -352,8 +352,9 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
 name = "chat-prompts"
-version = "0.17.5"
-source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=dev#ea9bd0ca1dedaaaed3c3ea64ad894a20213f44e4"
+version = "0.17.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6ce8c320d8e0c5617d4e5c8e43f0739a869fe0e892131c8905aaf316ec19a701"
 dependencies = [
  "base64 0.22.1",
  "clap",
@@ -609,8 +610,9 @@ dependencies = [
 
 [[package]]
 name = "endpoints"
-version = "0.18.0"
-source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=dev#ea9bd0ca1dedaaaed3c3ea64ad894a20213f44e4"
+version = "0.19.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1b5dbce05978e878c0a0d0a5c42420d1fe3a5f68abda7c6663a951a8ec68e456"
 dependencies = [
  "indexmap",
  "serde",
@@ -1421,8 +1423,9 @@ checksum = "4ee93343901ab17bd981295f2cf0026d4ad018c7c31ba84549a4ddbb47a45104"
 
 [[package]]
 name = "llama-core"
-version = "0.23.1"
-source = "git+https://github.com/LlamaEdge/LlamaEdge.git?branch=dev#ea9bd0ca1dedaaaed3c3ea64ad894a20213f44e4"
+version = "0.23.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f4b2006a7a49533e5bd62e739cdb2d4838e3f22f746a45714e5b374bfe3e6e9e"
 dependencies = [
  "base64 0.22.1",
  "chat-prompts",
@@ -3747,9 +3750,9 @@ dependencies = [
 
 [[package]]
 name = "wavup"
-version = "0.1.2"
+version = "0.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "aeeb7bc0cc5f2a88e42083f64730689dc502bccd03bf0b917ee622d96afa73e1"
+checksum = "f645c61994743d5b7ee4892bf3ceee4b2b96c3d11b05484dc035b252c12d9f13"
 dependencies = [
  "clap",
  "hound",
