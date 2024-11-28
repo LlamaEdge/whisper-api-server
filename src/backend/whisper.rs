@@ -494,6 +494,10 @@ pub(crate) async fn whisper_transcriptions_handler(req: Request<Body>) -> Respon
                 }
             }
 
+            if Some(true) == request.detect_language {
+                request.language = Some("auto".to_string());
+            }
+
             info!(target: "stdout", "Request: {:?}", &request);
 
             let obj = match llama_core::audio::audio_transcriptions(request).await {
@@ -1054,6 +1058,10 @@ pub(crate) async fn whisper_translations_handler(req: Request<Body>) -> Response
                         return error::internal_server_error(err_msg);
                     }
                 }
+            }
+
+            if Some(true) == request.detect_language {
+                request.language = Some("auto".to_string());
             }
 
             info!(target: "stdout", "Request: {:?}", &request);
