@@ -555,7 +555,7 @@ pub(crate) async fn whisper_transcriptions_handler(req: Request<Body>) -> Respon
                 };
 
                 // init the audio context
-                if let Err(e) = llama_core::init_whisper_context(&metadata) {
+                if let Err(e) = llama_core::init_whisper_context(metadata) {
                     let err_msg =
                         format!("Failed to create a new Whisper computation context. {}", e);
 
@@ -1187,7 +1187,7 @@ pub(crate) async fn whisper_translations_handler(req: Request<Body>) -> Response
                 };
 
                 // init the audio context
-                if let Err(e) = llama_core::init_whisper_context(&metadata) {
+                if let Err(e) = llama_core::init_whisper_context(metadata) {
                     let err_msg =
                         format!("Failed to create a new Whisper computation context. {}", e);
 
