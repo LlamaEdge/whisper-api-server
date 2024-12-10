@@ -64,20 +64,16 @@ struct Cli {
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<(), ServerError> {
     // get the environment variable `LLAMA_LOG`
-    let rust_log = std::env::var("LLAMA_LOG")
-        .unwrap_or_default()
-        .to_lowercase();
-    let (_, log_level) = match rust_log.is_empty() {
-        true => ("stdout", LogLevel::Info),
-        false => match rust_log.split_once("=") {
-            Some((target, level)) => (target, level.parse().unwrap_or(LogLevel::Info)),
-            None => ("stdout", rust_log.parse().unwrap_or(LogLevel::Info)),
-        },
-    };
+    let log_level: LogLevel = std::env::var("LLAMA_LOG")
+        .unwrap_or("info".to_string())
+        .parse()
+        .unwrap_or(LogLevel::Info);
 
     // set global logger
     wasi_logger::Logger::install().expect("failed to install wasi_logger::Logger");
     log::set_max_level(log_level.into());
+
+    info!(target: "stdout", "log_level: {}", log_level);
 
     // parse the command line arguments
     let cli = Cli::parse();
