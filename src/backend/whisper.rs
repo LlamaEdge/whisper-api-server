@@ -109,6 +109,8 @@ pub(crate) async fn whisper_transcriptions_handler(req: Request<Body>) -> Respon
                         // log
                         info!(target: "stdout", "file_id: {}, file_name: {}", &id, &filename);
 
+                        info!(target: "stdout", "Pre-processing the audio file...");
+
                         // create a audio converter
                         let converter = wavup::AudioConverterBuilder::new(
                             output_wav_file.to_string_lossy(),
