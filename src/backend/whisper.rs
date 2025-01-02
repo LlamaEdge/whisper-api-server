@@ -225,7 +225,34 @@ pub(crate) async fn whisper_transcriptions_handler(req: Request<Body>) -> Respon
                             return error::internal_server_error(err_msg);
                         }
                     },
-                    "response_format" => unimplemented!(),
+                    "response_format" => {
+                        match field.is_text() {
+                            true => {
+                                let mut response_format = String::new();
+
+                                if let Err(e) = field.data.read_to_string(&mut response_format) {
+                                    let err_msg =
+                                        format!("Failed to read the response format. {}", e);
+
+                                    // log
+                                    error!(target: "stdout", "{}", &err_msg);
+
+                                    return error::internal_server_error(err_msg);
+                                }
+
+                                request.response_format = Some(response_format);
+                            }
+                            false => {
+                                let err_msg =
+                                    "Failed to get the response format. The response format field in the request should be a text field.";
+
+                                // log
+                                error!(target: "stdout", "{}", &err_msg);
+
+                                return error::internal_server_error(err_msg);
+                            }
+                        }
+                    }
                     "temperature" => {
                         match field.is_text() {
                             true => {
