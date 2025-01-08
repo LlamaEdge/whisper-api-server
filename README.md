@@ -61,6 +61,12 @@ The following is the list of supported audio formats and codecs:
   wasmedge --dir .:. whisper-api-server.wasm -m ggml-medium.bin --socket-addr 0.0.0.0:10086
   ```
 
+  To start the server with api-key, set the environment variable `API_KEY` to specify the api-key, for example:
+
+  ```bash
+  wasmedge --dir .:. --env API_KEY=your_api_key whisper-api-server.wasm -m ggml-medium.bin
+  ```
+
 ### Usage
 
 #### Transcribe an audio file
