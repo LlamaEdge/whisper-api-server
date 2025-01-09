@@ -110,8 +110,10 @@ The following is the list of supported audio formats and codecs:
   curl --location 'http://localhost:8080/v1/audio/translations' \
     --header 'Content-Type: multipart/form-data' \
     --form 'file=@"test.wav"' \
-    --form 'language="cn"'
+    --form 'language="zh"'
   ```
+
+  **Note** that the correct value of `language` can be found in [ISO-639-1](https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes)
 
   If everything is set up correctly, you should see the following generated transcriptions:
 
