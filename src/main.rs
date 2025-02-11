@@ -13,7 +13,6 @@ use hyper::{
     service::{make_service_fn, service_fn},
     Body, Request, Response, Server,
 };
-use llama_core::metadata::whisper::WhisperMetadata;
 use once_cell::sync::OnceCell;
 use serde::{Deserialize, Serialize};
 use std::{net::SocketAddr, path::PathBuf};
@@ -26,8 +25,6 @@ const DEFAULT_PORT: &str = "8080";
 
 // server info
 pub(crate) static TASK: OnceCell<TaskType> = OnceCell::new();
-// metadata
-pub(crate) static METADATA: OnceCell<WhisperMetadata> = OnceCell::new();
 // API key
 pub(crate) static LLAMA_API_KEY: OnceCell<String> = OnceCell::new();
 
@@ -127,11 +124,6 @@ async fn main() -> Result<(), ServerError> {
     // init the audio context
     llama_core::init_whisper_context(&metadata)
         .map_err(|e| ServerError::Operation(e.to_string()))?;
-
-    // set metadata
-    METADATA
-        .set(metadata)
-        .map_err(|_| ServerError::Operation("Failed to set `METADATA`.".to_string()))?;
 
     // socket address
     let addr = match cli.socket_addr {
