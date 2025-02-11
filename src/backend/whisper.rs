@@ -1,4 +1,4 @@
-use crate::{error, METADATA};
+use crate::error;
 use endpoints::{
     audio::{transcription::TranscriptionRequest, translation::TranslationRequest},
     files::{DeleteFileStatus, FileObject},
@@ -512,44 +512,6 @@ pub(crate) async fn whisper_transcriptions_handler(req: Request<Body>) -> Respon
                             return error::internal_server_error(err_msg);
                         }
                     },
-                    "use_new_context" => match field.is_text() {
-                        true => {
-                            let mut use_new_context: String = String::new();
-
-                            if let Err(e) = field.data.read_to_string(&mut use_new_context) {
-                                let err_msg = format!("Failed to read `use_new_context`. {}", e);
-
-                                // log
-                                error!(target: "stdout", "{}", &err_msg);
-
-                                return error::internal_server_error(err_msg);
-                            }
-
-                            match use_new_context.parse::<bool>() {
-                                Ok(use_new_context) => {
-                                    request.use_new_context = use_new_context;
-                                }
-                                Err(e) => {
-                                    let err_msg =
-                                        format!("Failed to parse `use_new_context`. Reason: {}", e);
-
-                                    // log
-                                    error!(target: "stdout", "{}", &err_msg);
-
-                                    return error::bad_request(err_msg);
-                                }
-                            }
-                        }
-                        false => {
-                            let err_msg =
-                                "Failed to get `use_new_context`. The `use_new_context` field in the request should be a text field.";
-
-                            // log
-                            error!(target: "stdout", "{}", &err_msg);
-
-                            return error::internal_server_error(err_msg);
-                        }
-                    },
                     _ => {
                         let err_msg = format!("Invalid field name: {}", &field.headers.name);
 
@@ -565,35 +527,7 @@ pub(crate) async fn whisper_transcriptions_handler(req: Request<Body>) -> Respon
                 request.language = Some("auto".to_string());
             }
 
-            info!(target: "stdout", "Request: {:?}", &request);
-
-            // check if the request uses a new whisper computation context
-            if request.use_new_context {
-                info!(target: "stdout", "Create a new Whisper computation context");
-
-                let metadata = match METADATA.get() {
-                    Some(metadata) => metadata,
-                    None => {
-                        let err_msg = "Failed to get `METADATA`.";
-
-                        // log
-                        error!(target: "stdout", "{}", &err_msg);
-
-                        return error::internal_server_error(err_msg);
-                    }
-                };
-
-                // init the audio context
-                if let Err(e) = llama_core::init_whisper_context(metadata) {
-                    let err_msg =
-                        format!("Failed to create a new Whisper computation context. {}", e);
-
-                    // log
-                    error!(target: "stdout", "{}", &err_msg);
-
-                    return error::internal_server_error(err_msg);
-                }
-            }
+            debug!(target: "stdout", "Request: {}", serde_json::to_string(&request).unwrap());
 
             let obj = match llama_core::audio::audio_transcriptions(request).await {
                 Ok(obj) => obj,
@@ -1144,44 +1078,6 @@ pub(crate) async fn whisper_translations_handler(req: Request<Body>) -> Response
                             return error::internal_server_error(err_msg);
                         }
                     },
-                    "use_new_context" => match field.is_text() {
-                        true => {
-                            let mut use_new_context: String = String::new();
-
-                            if let Err(e) = field.data.read_to_string(&mut use_new_context) {
-                                let err_msg = format!("Failed to read `use_new_context`. {}", e);
-
-                                // log
-                                error!(target: "stdout", "{}", &err_msg);
-
-                                return error::internal_server_error(err_msg);
-                            }
-
-                            match use_new_context.parse::<bool>() {
-                                Ok(use_new_context) => {
-                                    request.use_new_context = use_new_context;
-                                }
-                                Err(e) => {
-                                    let err_msg =
-                                        format!("Failed to parse `use_new_context`. Reason: {}", e);
-
-                                    // log
-                                    error!(target: "stdout", "{}", &err_msg);
-
-                                    return error::bad_request(err_msg);
-                                }
-                            }
-                        }
-                        false => {
-                            let err_msg =
-                                "Failed to get `use_new_context`. The `use_new_context` field in the request should be a text field.";
-
-                            // log
-                            error!(target: "stdout", "{}", &err_msg);
-
-                            return error::internal_server_error(err_msg);
-                        }
-                    },
                     _ => {
                         let err_msg = format!("Invalid field name: {}", &field.headers.name);
 
@@ -1197,35 +1093,7 @@ pub(crate) async fn whisper_translations_handler(req: Request<Body>) -> Response
                 request.language = Some("auto".to_string());
             }
 
-            info!(target: "stdout", "Request: {:?}", &request);
-
-            // check if the request uses a new whisper computation context
-            if request.use_new_context {
-                info!(target: "stdout", "Create a new Whisper computation context");
-
-                let metadata = match METADATA.get() {
-                    Some(metadata) => metadata,
-                    None => {
-                        let err_msg = "Failed to get `METADATA`.";
-
-                        // log
-                        error!(target: "stdout", "{}", &err_msg);
-
-                        return error::internal_server_error(err_msg);
-                    }
-                };
-
-                // init the audio context
-                if let Err(e) = llama_core::init_whisper_context(metadata) {
-                    let err_msg =
-                        format!("Failed to create a new Whisper computation context. {}", e);
-
-                    // log
-                    error!(target: "stdout", "{}", &err_msg);
-
-                    return error::internal_server_error(err_msg);
-                }
-            }
+            debug!(target: "stdout", "Request: {}", serde_json::to_string(&request).unwrap());
 
             let obj = match llama_core::audio::audio_translations(request).await {
                 Ok(obj) => obj,
