@@ -166,7 +166,7 @@ async fn main() -> Result<(), ServerError> {
 
     // create server info
     let server_info = ApiServer {
-        ty: "llama".to_string(),
+        ty: "whisper".to_string(),
         version: env!("CARGO_PKG_VERSION").to_string(),
         plugin_version: "Unknown".to_string(),
         port: addr.port().to_string(),
