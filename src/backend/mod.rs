@@ -41,6 +41,7 @@ pub(crate) async fn handle_llama_request(req: Request<Body>) -> Response<Body> {
                 error::internal_server_error(err_msg)
             }
         },
+        "/v1/models" => whisper::models_handler().await,
         "/v1/info" => whisper::server_info_handler().await,
         "/v1/files" => whisper::files_handler(req).await,
         path => {

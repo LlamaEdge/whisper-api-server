@@ -2,6 +2,7 @@ use crate::{error, SERVER_INFO};
 use endpoints::{
     audio::{transcription::TranscriptionRequest, translation::TranslationRequest},
     files::{DeleteFileStatus, FileObject},
+    models::{ListModelsResponse, Model},
 };
 use hyper::{body::to_bytes, Body, Method, Request, Response};
 use multipart::server::{Multipart, ReadEntry, ReadEntryResult};
@@ -1151,6 +1152,76 @@ pub(crate) async fn whisper_translations_handler(req: Request<Body>) -> Response
     };
 
     info!(target: "stdout", "Send the audio translation response");
+
+    res
+}
+
+pub(crate) async fn models_handler() -> Response<Body> {
+    // log
+    info!(target: "stdout", "Handling the coming model list request.");
+
+    // get the model name
+    let server_info = SERVER_INFO.get().unwrap();
+    let model_name = if let Some(model_config) = &server_info.transcribe_model {
+        model_config.name.clone()
+    } else if let Some(model_config) = &server_info.translate_model {
+        model_config.name.clone()
+    } else {
+        let err_msg = "No model name found.";
+
+        // log
+        error!(target: "stdout", "{}", &err_msg);
+
+        return error::internal_server_error(err_msg);
+    };
+
+    let list_models_response = ListModelsResponse {
+        object: String::from("list"),
+        data: vec![Model {
+            id: model_name,
+            created: SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_secs(),
+            object: String::from("model"),
+            owned_by: String::from("Not specified"),
+        }],
+    };
+
+    // serialize response
+    let s = match serde_json::to_string(&list_models_response) {
+        Ok(s) => s,
+        Err(e) => {
+            let err_msg = format!("Failed to serialize the model list result. Reason: {}", e);
+
+            // log
+            error!(target: "stdout", "{}", &err_msg);
+
+            return error::internal_server_error(err_msg);
+        }
+    };
+
+    // return response
+    let result = Response::builder()
+        .header("Access-Control-Allow-Origin", "*")
+        .header("Access-Control-Allow-Methods", "*")
+        .header("Access-Control-Allow-Headers", "*")
+        .header("Content-Type", "application/json")
+        .body(Body::from(s));
+    let res = match result {
+        Ok(response) => response,
+        Err(e) => {
+            let err_msg = format!("Failed to get model list. Reason: {}", e);
+
+            // log
+            error!(target: "stdout", "{}", &err_msg);
+
+            error::internal_server_error(err_msg)
+        }
+    };
+
+    // log
+    info!(target: "stdout", "Send the model list response.");
 
     res
 }
