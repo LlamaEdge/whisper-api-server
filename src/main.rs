@@ -134,26 +134,22 @@ async fn main() -> Result<(), ServerError> {
             transcribe_model = Some(ModelConfig {
                 name: cli.model_name,
                 ty: "transcribe".to_string(),
-                ..Default::default()
             });
         }
         TaskType::Translations => {
             translate_model = Some(ModelConfig {
                 name: cli.model_name,
                 ty: "translate".to_string(),
-                ..Default::default()
             });
         }
         TaskType::Full => {
             translate_model = Some(ModelConfig {
                 name: cli.model_name.clone(),
                 ty: "translate".to_string(),
-                ..Default::default()
             });
             transcribe_model = Some(ModelConfig {
                 name: cli.model_name.clone(),
                 ty: "transcribe".to_string(),
-                ..Default::default()
             });
         }
     };
@@ -168,7 +164,6 @@ async fn main() -> Result<(), ServerError> {
     let server_info = ApiServer {
         ty: "whisper".to_string(),
         version: env!("CARGO_PKG_VERSION").to_string(),
-        plugin_version: "Unknown".to_string(),
         port: addr.port().to_string(),
         translate_model,
         transcribe_model,
@@ -383,8 +378,6 @@ pub(crate) struct ApiServer {
     #[serde(rename = "type")]
     ty: String,
     version: String,
-    #[serde(rename = "ggml_plugin_version")]
-    plugin_version: String,
     port: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     translate_model: Option<ModelConfig>,
@@ -400,33 +393,4 @@ pub(crate) struct ModelConfig {
     // type: chat or embedding
     #[serde(rename = "type")]
     ty: String,
-    pub ctx_size: u64,
-    pub batch_size: u64,
-    pub ubatch_size: u64,
-    // #[serde(skip_serializing_if = "Option::is_none")]
-    // pub prompt_template: Option<PromptTemplateType>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub n_predict: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub reverse_prompt: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub n_gpu_layers: Option<u64>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub use_mmap: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub temperature: Option<f64>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub top_p: Option<f64>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub repeat_penalty: Option<f64>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub presence_penalty: Option<f64>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub frequency_penalty: Option<f64>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub split_mode: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub main_gpu: Option<u64>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub tensor_split: Option<String>,
 }
