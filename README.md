@@ -168,6 +168,7 @@ Options:
       --threads <THREADS>          Number of threads to use during computation [default: 4]
       --processors <PROCESSORS>    Number of processors to use during computation [default: 1]
       --task <TASK>                Task type [default: full] [possible values: transcribe, translate, full]
+      --no-audio-preprocessor      Do not pre-process input audio files
       --port <PORT>                Port number [default: 8080]
       --socket-addr <SOCKET_ADDR>  Socket address of LlamaEdge API Server instance. For example, `0.0.0.0:8080`
   -h, --help                       Print help (see more with '--help')

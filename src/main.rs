@@ -30,6 +30,8 @@ const DEFAULT_PORT: &str = "8080";
 pub(crate) static TASK: OnceCell<TaskType> = OnceCell::new();
 // API key
 pub(crate) static LLAMA_API_KEY: OnceCell<String> = OnceCell::new();
+// Use audio pre-processor
+pub(crate) static USE_AUDIO_PREPROCESSOR: OnceCell<bool> = OnceCell::new();
 
 #[derive(Debug, Parser)]
 #[command(name = "Whisper API Server", version = env!("CARGO_PKG_VERSION"), author = env!("CARGO_PKG_AUTHORS"), about = "Whisper API Server")]
@@ -53,6 +55,9 @@ struct Cli {
     /// Task type.
     #[arg(long, default_value = "full")]
     task: TaskType,
+    /// Do not pre-process input audio files.
+    #[arg(long, default_value = "false")]
+    no_audio_preprocessor: bool,
     /// Port number
     #[arg(long, default_value = DEFAULT_PORT, value_parser = clap::value_parser!(u16), group = "socket_address_group")]
     port: u16,
@@ -113,6 +118,14 @@ async fn main() -> Result<(), ServerError> {
 
     TASK.set(cli.task)
         .map_err(|_| ServerError::Operation("Failed to set `TASK`.".to_string()))?;
+
+    info!(target: "stdout", "pre-process input audio files: {}", !cli.no_audio_preprocessor);
+
+    USE_AUDIO_PREPROCESSOR
+        .set(!cli.no_audio_preprocessor)
+        .map_err(|_| {
+            ServerError::Operation("Failed to set `USE_AUDIO_PREPROCESSOR`.".to_string())
+        })?;
 
     // create a Metadata instance
     let metadata = llama_core::metadata::whisper::WhisperMetadataBuilder::new(

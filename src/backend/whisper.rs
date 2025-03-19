@@ -1,4 +1,4 @@
-use crate::{error, SERVER_INFO};
+use crate::{error, SERVER_INFO, USE_AUDIO_PREPROCESSOR};
 use endpoints::{
     audio::{transcription::TranscriptionRequest, translation::TranslationRequest},
     files::{DeleteFileStatus, FileObject},
@@ -110,20 +110,45 @@ pub(crate) async fn whisper_transcriptions_handler(req: Request<Body>) -> Respon
                         // log
                         info!(target: "stdout", "file_id: {}, file_name: {}", &id, &filename);
 
-                        info!(target: "stdout", "Pre-processing the audio file...");
+                        let use_audio_preprocessor = match USE_AUDIO_PREPROCESSOR.get() {
+                            Some(use_audio_preprocessor) => *use_audio_preprocessor,
+                            None => false,
+                        };
 
-                        // create a audio converter
-                        let converter = wavup::AudioConverterBuilder::new(
-                            output_wav_file.to_string_lossy(),
-                            llama_core::metadata::whisper::WHISPER_SAMPLE_RATE as u32,
-                        )
-                        .build();
+                        if use_audio_preprocessor {
+                            info!(target: "stdout", "Pre-processing the audio file...");
 
-                        // convert to a wav audio file with the given sample rate
-                        if let Err(e) = converter.convert_audio_from_bytes(&buffer) {
-                            let err_msg = format!("Failed to convert audio. {}", e);
-                            error!(target: "stdout", "{}", &err_msg);
-                            return error::internal_server_error(err_msg);
+                            // create a audio converter
+                            let converter = wavup::AudioConverterBuilder::new(
+                                output_wav_file.to_string_lossy(),
+                                llama_core::metadata::whisper::WHISPER_SAMPLE_RATE as u32,
+                            )
+                            .build();
+
+                            // convert to a wav audio file with the given sample rate
+                            if let Err(e) = converter.convert_audio_from_bytes(&buffer) {
+                                let err_msg = format!("Failed to convert audio. {}", e);
+                                error!(target: "stdout", "{}", &err_msg);
+                                return error::internal_server_error(err_msg);
+                            }
+                        } else {
+                            // write the audio data to the wav file
+                            let mut file = match File::create(output_wav_file) {
+                                Ok(file) => file,
+                                Err(e) => {
+                                    let err_msg = format!("Failed to create the wav file. {}", e);
+                                    error!(target: "stdout", "{}", &err_msg);
+                                    return error::internal_server_error(err_msg);
+                                }
+                            };
+                            if let Err(e) = file.write_all(&buffer) {
+                                let err_msg = format!(
+                                    "Failed to write the audio data to the wav file. {}",
+                                    e
+                                );
+                                error!(target: "stdout", "{}", &err_msg);
+                                return error::internal_server_error(err_msg);
+                            };
                         }
 
                         let created_at =
@@ -686,19 +711,60 @@ pub(crate) async fn whisper_translations_handler(req: Request<Body>) -> Response
                         // log
                         info!(target: "stdout", "file_id: {}, file_name: {}", &id, &filename);
 
-                        // create a audio converter
-                        let converter = wavup::AudioConverterBuilder::new(
-                            output_wav_file.to_string_lossy(),
-                            llama_core::metadata::whisper::WHISPER_SAMPLE_RATE as u32,
-                        )
-                        .build();
+                        let use_audio_preprocessor = match USE_AUDIO_PREPROCESSOR.get() {
+                            Some(use_audio_preprocessor) => *use_audio_preprocessor,
+                            None => false,
+                        };
 
-                        // convert to a wav audio file with the given sample rate
-                        if let Err(e) = converter.convert_audio_from_bytes(&buffer) {
-                            let err_msg = format!("Failed to convert audio. {}", e);
-                            error!(target: "stdout", "{}", &err_msg);
-                            return error::internal_server_error(err_msg);
+                        if use_audio_preprocessor {
+                            info!(target: "stdout", "Pre-processing the audio file...");
+
+                            // create a audio converter
+                            let converter = wavup::AudioConverterBuilder::new(
+                                output_wav_file.to_string_lossy(),
+                                llama_core::metadata::whisper::WHISPER_SAMPLE_RATE as u32,
+                            )
+                            .build();
+
+                            // convert to a wav audio file with the given sample rate
+                            if let Err(e) = converter.convert_audio_from_bytes(&buffer) {
+                                let err_msg = format!("Failed to convert audio. {}", e);
+                                error!(target: "stdout", "{}", &err_msg);
+                                return error::internal_server_error(err_msg);
+                            }
+                        } else {
+                            // write the audio data to the wav file
+                            let mut file = match File::create(output_wav_file) {
+                                Ok(file) => file,
+                                Err(e) => {
+                                    let err_msg = format!("Failed to create the wav file. {}", e);
+                                    error!(target: "stdout", "{}", &err_msg);
+                                    return error::internal_server_error(err_msg);
+                                }
+                            };
+                            if let Err(e) = file.write_all(&buffer) {
+                                let err_msg = format!(
+                                    "Failed to write the audio data to the wav file. {}",
+                                    e
+                                );
+                                error!(target: "stdout", "{}", &err_msg);
+                                return error::internal_server_error(err_msg);
+                            };
                         }
+
+                        // // create a audio converter
+                        // let converter = wavup::AudioConverterBuilder::new(
+                        //     output_wav_file.to_string_lossy(),
+                        //     llama_core::metadata::whisper::WHISPER_SAMPLE_RATE as u32,
+                        // )
+                        // .build();
+
+                        // // convert to a wav audio file with the given sample rate
+                        // if let Err(e) = converter.convert_audio_from_bytes(&buffer) {
+                        //     let err_msg = format!("Failed to convert audio. {}", e);
+                        //     error!(target: "stdout", "{}", &err_msg);
+                        //     return error::internal_server_error(err_msg);
+                        // }
 
                         let created_at =
                             match SystemTime::now().duration_since(std::time::UNIX_EPOCH) {
